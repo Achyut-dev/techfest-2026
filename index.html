@@ -1,0 +1,3189 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Techfest '26 — An Aetherial Renaissance | 30th Edition • IIT Bombay</title>
+
+  <!-- Google Fonts: Syne, Space Grotesk, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#04060e',
+            cyanGlow: '#00f0ff',
+            celestialGold: '#f5b942',
+            plasmaViolet: '#8b5cf6',
+          },
+          fontFamily: {
+            display: ['Syne', 'Space Grotesk', 'sans-serif'],
+            heading: ['Space Grotesk', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Three.js r128 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* =========================================================================
+       CORE AESTHETIC TOKENS & GLOBAL STYLES — "AN AETHERIAL RENAISSANCE"
+       ========================================================================= */
+    :root {
+      --bg-obsidian: #04060e;
+      --accent-cyan: #00f0ff;
+      --accent-gold: #f5b942;
+      --accent-violet: #8b5cf6;
+      --glass-bg: rgba(7, 11, 24, 0.62);
+      --glass-border: rgba(255, 255, 255, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-obsidian);
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Luminous Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #04060e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #00f0ff, #f5b942, #8b5cf6);
+      border-radius: 9999px;
+    }
+
+    /* Fixed 3D WebGL Canvas */
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+      outline: none;
+    }
+
+    /* Subtle Ambient Vignette & Scanline Texture Overlay */
+    .aether-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 45%, transparent 38%, rgba(4, 6, 14, 0.72) 100%),
+        linear-gradient(180deg, rgba(4, 6, 14, 0.55) 0%, transparent 15%, transparent 85%, rgba(4, 6, 14, 0.85) 100%);
+    }
+
+    /* Desktop Cursor Glow Follower */
+    #cursor-glow {
+      position: fixed;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 3;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.11) 0%, rgba(245, 185, 66, 0.05) 38%, transparent 72%);
+      mix-blend-mode: screen;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    /* Glassmorphic Surfaces */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-panel-gold {
+      background: linear-gradient(145deg, rgba(16, 15, 24, 0.78), rgba(7, 10, 22, 0.7));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(245, 185, 66, 0.32);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), 0 0 32px rgba(245, 185, 66, 0.08), inset 0 1px 0 rgba(245, 185, 66, 0.25);
+    }
+
+    .glass-btn {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .glass-btn:hover {
+      transform: translateY(-2px);
+    }
+    .glass-btn:active {
+      transform: translateY(0px) scale(0.98);
+    }
+
+    /* Gradient Text Helpers */
+    .text-gradient-aether {
+      background: linear-gradient(110deg, #ffffff 10%, #00f0ff 48%, #f5b942 86%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .text-gradient-gold {
+      background: linear-gradient(120deg, #fff5d6 0%, #f5b942 52%, #e08d1a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Competition Card Active Glow */
+    .comp-card {
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .comp-card.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.11), rgba(139, 92, 246, 0.09), rgba(7, 11, 24, 0.85));
+      border-color: rgba(0, 240, 255, 0.65);
+      box-shadow: 0 0 28px rgba(0, 240, 255, 0.16), inset 0 0 20px rgba(0, 240, 255, 0.06);
+    }
+
+    /* 3D Interactive Viewport HUD Brackets */
+    .hud-bracket {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      border-color: rgba(0, 240, 255, 0.55);
+    }
+    .hud-tl { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 6px; }
+    .hud-tr { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 6px; }
+    .hud-bl { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 6px; }
+    .hud-br { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 6px; }
+
+    /* Control Dock Toggle Active State */
+    .dock-btn.active {
+      background: rgba(0, 240, 255, 0.18);
+      border-color: rgba(0, 240, 255, 0.8);
+      color: #00f0ff;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.25);
+    }
+
+    /* Holographic 3D Tilting Visitor Pass */
+    .holo-stage {
+      perspective: 1200px;
+    }
+
+    .holo-card {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      background:
+        radial-gradient(circle at 18% 15%, rgba(0, 240, 255, 0.18), transparent 45%),
+        radial-gradient(circle at 86% 82%, rgba(245, 185, 66, 0.18), transparent 48%),
+        linear-gradient(140deg, rgba(13, 18, 36, 0.94) 0%, rgba(7, 10, 22, 0.97) 55%, rgba(20, 14, 38, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.72),
+        0 0 40px rgba(0, 240, 255, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      overflow: hidden;
+    }
+
+    /* Iridescent Foil Overlay driven by CSS custom vars --mx, --my */
+    .holo-foil {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.42;
+      mix-blend-mode: color-dodge;
+      background:
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.55) 0%, rgba(0, 240, 255, 0.28) 20%, rgba(245, 185, 66, 0.25) 42%, rgba(139, 92, 246, 0.22) 64%, transparent 80%),
+        repeating-linear-gradient(
+          115deg,
+          rgba(0, 240, 255, 0.08) 0%,
+          rgba(245, 185, 66, 0.1) 12%,
+          rgba(139, 92, 246, 0.09) 24%,
+          rgba(0, 240, 255, 0.08) 36%
+        );
+      transition: opacity 0.25s ease;
+    }
+
+    .holo-card:hover .holo-foil {
+      opacity: 0.72;
+    }
+
+    /* Subtle Geometric Astrolabe Watermark on Pass */
+    .holo-watermark {
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 210px;
+      height: 210px;
+      opacity: 0.12;
+      pointer-events: none;
+      animation: slowSpin 26s linear infinite;
+    }
+
+    @keyframes slowSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.92); opacity: 0.85; }
+      70% { transform: scale(1.22); opacity: 0; }
+      100% { transform: scale(1.22); opacity: 0; }
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+
+    /* Audio Equalizer Bars */
+    .eq-bar {
+      width: 2px;
+      border-radius: 99px;
+      background: #00f0ff;
+      transition: height 0.2s ease;
+    }
+    .sfx-active .eq-bar:nth-child(1) { animation: eqBounce 0.75s ease-in-out infinite alternate; }
+    .sfx-active .eq-bar:nth-child(2) { animation: eqBounce 0.55s ease-in-out 0.15s infinite alternate; }
+    .sfx-active .eq-bar:nth-child(3) { animation: eqBounce 0.85s ease-in-out 0.3s infinite alternate; }
+    @keyframes eqBounce {
+      from { height: 4px; }
+      to { height: 14px; }
+    }
+
+    /* Loading Screen Transition */
+    #loader-screen {
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.85s ease;
+    }
+    #loader-screen.hidden-loader {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Scroll Pointer Passthrough System */
+    main {
+      position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .interactive-ui {
+      pointer-events: auto;
+    }
+
+    /* Orbital Progress Rail */
+    .rail-dot {
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .rail-item.active .rail-dot {
+      background: #00f0ff;
+      box-shadow: 0 0 14px #00f0ff, 0 0 28px rgba(0, 240, 255, 0.6);
+      transform: scale(1.4);
+    }
+    .rail-item.active .rail-label {
+      color: #ffffff;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Schedule Tab Active */
+    .day-tab.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(139, 92, 246, 0.18));
+      border-color: rgba(0, 240, 255, 0.75);
+      color: #ffffff;
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.18);
+    }
+
+    /* Track Pill Active */
+    .track-pill.active {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.16);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.22);
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-slate-100 selection:bg-cyanGlow/30 selection:text-white">
+
+  <!-- =========================================================================
+       ANIMATED LOADING SCREEN ("INITIALIZING AETHERIAL CORE // 30TH EDITION")
+       ========================================================================= -->
+  <div id="loader-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#04060e] px-6">
+    <!-- Subtle radial core glow -->
+    <div class="pointer-events-none absolute h-80 w-80 rounded-full bg-cyanGlow/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute h-64 w-64 rounded-full bg-celestialGold/10 blur-3xl"></div>
+
+    <!-- Animated Da Vinci Astrolabe SVG -->
+    <div class="relative mb-8 flex h-32 w-32 items-center justify-center">
+      <svg viewBox="0 0 140 140" class="h-full w-full animate-[spin_10s_linear_infinite]">
+        <circle cx="70" cy="70" r="64" fill="none" stroke="rgba(245,185,66,0.35)" stroke-width="1" stroke-dasharray="4 6" />
+        <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(0,240,255,0.75)" stroke-width="1.5" stroke-dasharray="26 14 8 14" />
+        <polygon points="70,12 122,100 18,100" fill="none" stroke="rgba(245,185,66,0.55)" stroke-width="1" />
+      </svg>
+      <svg viewBox="0 0 100 100" class="absolute h-20 w-20 animate-[spin_6s_linear_infinite_reverse]">
+        <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(139,92,246,0.8)" stroke-width="1.5" stroke-dasharray="18 10" />
+        <rect x="33" y="33" width="34" height="34" transform="rotate(45 50 50)" fill="none" stroke="#00f0ff" stroke-width="1.2" />
+      </svg>
+      <div class="absolute h-3.5 w-3.5 rounded-full bg-cyanGlow shadow-[0_0_20px_#00f0ff]"></div>
+    </div>
+
+    <div class="font-mono text-[11px] sm:text-xs tracking-[0.28em] text-cyanGlow/90 uppercase text-center">
+      INITIALIZING AETHERIAL CORE // 30TH EDITION
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="mt-5 h-[2px] w-64 sm:w-80 overflow-hidden rounded-full bg-white/10">
+      <div id="loader-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-cyanGlow via-celestialGold to-plasmaViolet transition-all duration-150"></div>
+    </div>
+
+    <div class="mt-3 flex w-64 sm:w-80 items-center justify-between font-mono text-[11px] text-slate-400">
+      <span id="loader-status">CALIBRATING CELESTIAL OPTICS...</span>
+      <span id="loader-percent" class="font-semibold text-celestialGold">0%</span>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       FIXED FULL-VIEWPORT 3D WEBGL CANVAS & AMBIENT LAYERS
+       ========================================================================= -->
+  <canvas id="webgl-canvas"></canvas>
+  <div class="aether-vignette"></div>
+  <div id="cursor-glow" class="hidden md:block"></div>
+
+  <!-- Fallback Banner if WebGL fails -->
+  <div id="webgl-fallback" class="hidden fixed bottom-6 left-6 z-50 glass-panel rounded-xl px-4 py-3 font-mono text-xs text-celestialGold">
+    WebGL Hardware Acceleration Unavailable — Displaying High-Contrast HUD Mode
+  </div>
+
+  <!-- =========================================================================
+       HUD TOAST NOTIFICATION (Replaces alert/confirm)
+       ========================================================================= -->
+  <div id="hud-toast" class="fixed bottom-6 left-1/2 z-[90] -translate-x-1/2 translate-y-16 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="glass-panel-gold flex items-center gap-3 rounded-full px-5 py-2.5 text-xs sm:text-sm font-mono text-white shadow-2xl">
+      <span class="h-2 w-2 rounded-full bg-cyanGlow shadow-[0_0_10px_#00f0ff]"></span>
+      <span id="hud-toast-text">SYSTEM READY</span>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       TOP TRANSLUCENT HUD NAVBAR
+       ========================================================================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none">
+    <nav class="interactive-ui mx-auto flex max-w-7xl items-center justify-between rounded-2xl glass-panel px-4 sm:px-6 py-2.5 sm:py-3">
+      <!-- Brand Mark -->
+      <a href="#act-1" class="group flex items-center gap-3">
+        <div class="relative flex h-9 w-9 items-center justify-center rounded-xl border border-celestialGold/40 bg-white/5 group-hover:border-cyanGlow/70 transition-colors">
+          <svg viewBox="0 0 36 36" class="h-6 w-6">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#f5b942" stroke-width="1.3" stroke-dasharray="6 3" />
+            <circle cx="18" cy="18" r="8" fill="none" stroke="#00f0ff" stroke-width="1.3" />
+            <circle cx="18" cy="18" r="2.5" fill="#00f0ff" />
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <div class="font-display text-sm sm:text-base font-bold tracking-wider text-white">
+            TECHFEST <span class="text-celestialGold">'26</span>
+          </div>
+          <div class="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-cyanGlow/80">
+            30TH EDITION // IITB
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop Jump Links -->
+      <div class="hidden lg:flex items-center gap-7 font-mono text-xs tracking-widest text-slate-300">
+        <a href="#act-1" data-act-link="0" class="nav-jump hover:text-cyanGlow transition-colors">01.CORE</a>
+        <a href="#act-2" data-act-link="1" class="nav-jump hover:text-celestialGold transition-colors">02.LEGACY</a>
+        <a href="#act-3" data-act-link="2" class="nav-jump hover:text-cyanGlow transition-colors">03.ARENA</a>
+        <a href="#act-4" data-act-link="3" class="nav-jump hover:text-plasmaViolet transition-colors">04.CAMPUS</a>
+        <a href="#act-5" data-act-link="4" class="nav-jump hover:text-celestialGold transition-colors">05.PASS</a>
+      </div>
+
+      <!-- Right Controls: Sound Toggle + Get Pass CTA -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="sfx-toggle-btn" type="button" aria-label="Toggle Sci-Fi UI Sound"
+          class="glass-btn flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 font-mono text-[10px] sm:text-xs text-slate-300 hover:border-cyanGlow/60 hover:text-white">
+          <span id="sfx-eq" class="flex items-end gap-[2px] h-3.5">
+            <span class="eq-bar h-[5px]"></span>
+            <span class="eq-bar h-[9px]"></span>
+            <span class="eq-bar h-[6px]"></span>
+          </span>
+          <span id="sfx-label" class="hidden sm:inline">SFX OFF</span>
+        </button>
+
+        <a href="#act-5" class="glass-btn rounded-xl bg-gradient-to-r from-cyanGlow/90 to-celestialGold/90 px-3.5 sm:px-5 py-2 font-heading text-xs sm:text-sm font-bold tracking-wide text-obsidian shadow-[0_0_24px_rgba(0,240,255,0.3)] hover:shadow-[0_0_32px_rgba(245,185,66,0.45)]">
+          GET PASS
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- =========================================================================
+       RIGHT-SIDE VERTICAL ORBITAL PROGRESS RAIL
+       ========================================================================= -->
+  <aside aria-label="Orbital Scroll Navigation" class="fixed right-3 sm:right-6 top-1/2 z-40 -translate-y-1/2 hidden md:flex flex-col items-end gap-5">
+    <div class="relative flex flex-col items-end gap-5 py-2">
+      <!-- Vertical background line -->
+      <div class="pointer-events-none absolute right-[5px] top-3 bottom-3 w-[1px] bg-white/15"></div>
+      <!-- Dynamic glowing fill line -->
+      <div id="rail-progress-line" class="pointer-events-none absolute right-[5px] top-3 w-[1.5px] bg-gradient-to-b from-cyanGlow via-celestialGold to-plasmaViolet shadow-[0_0_10px_#00f0ff]" style="height: 0%;"></div>
+
+      <button data-target="#act-1" data-rail="0" class="rail-item active group flex items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-slate-400 hover:text-white">
+        <span class="rail-label opacity-60 group-hover:opacity-100 transition-all">01 // CORE</span>
+        <span class="rail-dot h-2.5 w-2.5 rounded-full border border-white/40 bg-obsidian"></span>
+      </button>
+      <button data-target="#act-2" data-rail="1" class="rail-item group flex items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-slate-400 hover:text-white">
+        <span class="rail-label opacity-60 group-hover:opacity-100 transition-all">02 // LEGACY</span>
+        <span class="rail-dot h-2.5 w-2.5 rounded-full border border-white/40 bg-obsidian"></span>
+      </button>
+      <button data-target="#act-3" data-rail="2" class="rail-item group flex items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-slate-400 hover:text-white">
+        <span class="rail-label opacity-60 group-hover:opacity-100 transition-all">03 // ARENA</span>
+        <span class="rail-dot h-2.5 w-2.5 rounded-full border border-white/40 bg-obsidian"></span>
+      </button>
+      <button data-target="#act-4" data-rail="3" class="rail-item group flex items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-slate-400 hover:text-white">
+        <span class="rail-label opacity-60 group-hover:opacity-100 transition-all">04 // CAMPUS</span>
+        <span class="rail-dot h-2.5 w-2.5 rounded-full border border-white/40 bg-obsidian"></span>
+      </button>
+      <button data-target="#act-5" data-rail="4" class="rail-item group flex items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-slate-400 hover:text-white">
+        <span class="rail-label opacity-60 group-hover:opacity-100 transition-all">05 // PORTAL</span>
+        <span class="rail-dot h-2.5 w-2.5 rounded-full border border-white/40 bg-obsidian"></span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       SCROLLABLE 5-ACT CONTENT OVERLAY
+       ========================================================================= -->
+  <main>
+
+    <!-- =======================================================================
+         ACT 1 — HERO ("TECHFEST '26: AN AETHERIAL RENAISSANCE")
+         ======================================================================= -->
+    <section id="act-1" data-act="0" class="relative flex min-h-screen flex-col justify-between px-4 sm:px-8 lg:px-14 pt-28 pb-10">
+      <!-- Top Telemetry Bar -->
+      <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 font-mono text-[10px] sm:text-xs text-slate-400">
+        <div class="flex items-center gap-2">
+          <span class="inline-block h-2 w-2 rounded-full bg-cyanGlow animate-pulse shadow-[0_0_8px_#00f0ff]"></span>
+          <span>19.1334° N, 72.9133° E // POWAI, MUMBAI</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-3 text-celestialGold/90">
+          <span>ASIA'S LARGEST SCIENCE &amp; TECHNOLOGY FESTIVAL</span>
+          <span class="text-white/25">|</span>
+          <span>ACT 01 / 05</span>
+        </div>
+      </div>
+
+      <!-- Center Hero Overlay (Carefully positioned so 3D Astrolabe shines right behind & through) -->
+      <div class="mx-auto my-auto flex w-full max-w-5xl flex-col items-center text-center py-10">
+        <div class="interactive-ui mb-5 inline-flex items-center gap-2.5 rounded-full border border-celestialGold/40 bg-obsidian/60 px-4 py-1.5 backdrop-blur-md">
+          <span class="h-1.5 w-1.5 rounded-full bg-celestialGold"></span>
+          <span class="font-mono text-[11px] sm:text-xs font-medium tracking-[0.22em] text-celestialGold">
+            16–18 DEC 2026 • IIT BOMBAY • 30TH EDITION
+          </span>
+        </div>
+
+        <h1 class="font-display text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tight leading-[0.94] drop-shadow-[0_8px_36px_rgba(0,0,0,0.85)]">
+          <span class="block text-white">TECHFEST <span class="text-gradient-gold">'26</span></span>
+        </h1>
+
+        <p class="mt-4 font-heading text-lg sm:text-2xl md:text-3xl font-semibold tracking-[0.22em] uppercase text-gradient-aether drop-shadow-[0_4px_20px_rgba(0,240,255,0.28)]">
+          AN AETHERIAL RENAISSANCE
+        </p>
+
+        <p class="mt-5 max-w-2xl text-sm sm:text-base text-slate-300/90 leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+          Where celestial Da Vinci geometry converges with frontier autonomous robotics, quantum intelligence, and kinetic spectacle. Step into the 30th landmark edition at IIT Bombay.
+        </p>
+
+        <!-- Primary CTA Buttons -->
+        <div class="interactive-ui mt-9 flex flex-wrap items-center justify-center gap-4">
+          <a href="#act-3" class="glass-btn group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyanGlow to-[#4de8ff] px-7 py-3.5 font-heading text-sm sm:text-base font-bold tracking-wider text-obsidian shadow-[0_0_32px_rgba(0,240,255,0.38)] hover:shadow-[0_0_45px_rgba(0,240,255,0.62)]">
+            <span>EXPLORE THE ARENA</span>
+            <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a href="#act-5" class="glass-btn flex items-center gap-3 rounded-2xl glass-panel-gold px-7 py-3.5 font-heading text-sm sm:text-base font-semibold tracking-wider text-celestialGold hover:text-white hover:border-celestialGold">
+            <span>GET CAMPUS PASS</span>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M7 15h4M7 11h10" stroke-linecap="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Bottom Dynamic Scroll Cue -->
+      <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-2">
+        <div class="font-mono text-[10px] tracking-[0.28em] text-slate-400 uppercase">
+          SCROLL TO DESCEND // MOVE CURSOR FOR PARALLAX
+        </div>
+        <div class="flex h-9 w-5 items-start justify-center rounded-full border border-cyanGlow/45 p-1">
+          <div class="h-2 w-1 rounded-full bg-cyanGlow animate-bounce"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ACT 2 — 30 YEARS OF LEGACY (ABOUT & TELEMETRY)
+         ======================================================================= -->
+    <section id="act-2" data-act="1" class="relative flex min-h-screen items-center px-4 sm:px-8 lg:px-14 py-24">
+      <div class="mx-auto w-full max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <!-- Left Editorial Narrative -->
+          <div class="lg:col-span-6 interactive-ui">
+            <div class="glass-panel-gold rounded-3xl p-6 sm:p-9">
+              <div class="flex items-center gap-3 font-mono text-xs tracking-[0.25em] text-celestialGold">
+                <span class="h-[1px] w-8 bg-celestialGold"></span>
+                <span>ACT 02 // EPOCH 1998 — 2026</span>
+              </div>
+
+              <h2 class="mt-4 font-display text-3xl sm:text-5xl font-bold leading-tight text-white">
+                Three Decades of <span class="text-gradient-gold">Scientific Alchemy</span>
+              </h2>
+
+              <p class="mt-5 text-sm sm:text-base leading-relaxed text-slate-300">
+                Born in 1998 inside the hallowed corridors of <strong class="text-white">IIT Bombay</strong>, Techfest has evolved into Asia’s premier crucible for builders, polymaths, and visionaries. As the celestial astrolabe expands into its <strong class="text-celestialGold">30th Edition</strong>, <em>An Aetherial Renaissance</em> honors timeless human ingenuity while launching the next frontier of autonomous intelligence.
+              </p>
+
+              <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div class="text-slate-400 text-[10px]">VENUE COORDINATES</div>
+                  <div class="mt-1 text-white">IIT Bombay, Powai, Mumbai</div>
+                </div>
+                <div class="rounded-xl border border-celestialGold/25 bg-celestialGold/5 px-4 py-3">
+                  <div class="text-celestialGold/80 text-[10px]">CELESTIAL TELEMETRY</div>
+                  <div class="mt-1 text-celestialGold">PLANETARY DISK EXPANDED</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Animated Telemetry Counter Grid -->
+          <div class="lg:col-span-6 interactive-ui">
+            <div id="legacy-metrics" class="grid grid-cols-2 sm:grid-cols-6 gap-4">
+              <!-- Metric 1 -->
+              <div class="sm:col-span-3 glass-panel rounded-2xl p-5 sm:p-6 hover:border-celestialGold/50 transition-colors">
+                <div class="font-mono text-[10px] tracking-[0.2em] text-celestialGold uppercase">MILESTONE</div>
+                <div class="mt-2 font-display text-4xl sm:text-5xl font-extrabold text-white">
+                  <span class="counter" data-target="30" data-decimals="0">0</span><span class="text-celestialGold text-2xl align-top">th</span>
+                </div>
+                <div class="mt-1 text-xs sm:text-sm text-slate-400">Landmark Edition (Est. 1998)</div>
+              </div>
+
+              <!-- Metric 2 -->
+              <div class="sm:col-span-3 glass-panel rounded-2xl p-5 sm:p-6 hover:border-cyanGlow/50 transition-colors">
+                <div class="font-mono text-[10px] tracking-[0.2em] text-cyanGlow uppercase">ANNUAL REACH</div>
+                <div class="mt-2 font-display text-4xl sm:text-5xl font-extrabold text-white">
+                  <span class="counter" data-target="1.8" data-decimals="1">0</span><span class="text-cyanGlow">L+</span>
+                </div>
+                <div class="mt-1 text-xs sm:text-sm text-slate-400">On-Campus Footfall</div>
+              </div>
+
+              <!-- Metric 3 -->
+              <div class="sm:col-span-2 glass-panel rounded-2xl p-5 hover:border-plasmaViolet/50 transition-colors">
+                <div class="font-mono text-[10px] tracking-[0.18em] text-plasmaViolet uppercase">ARENA</div>
+                <div class="mt-2 font-display text-3xl sm:text-4xl font-extrabold text-white">
+                  <span class="counter" data-target="35000" data-decimals="0" data-comma="true">0</span><span class="text-plasmaViolet">+</span>
+                </div>
+                <div class="mt-1 text-xs text-slate-400">Competitors</div>
+              </div>
+
+              <!-- Metric 4 -->
+              <div class="sm:col-span-2 glass-panel rounded-2xl p-5 hover:border-cyanGlow/50 transition-colors">
+                <div class="font-mono text-[10px] tracking-[0.18em] text-cyanGlow uppercase">EXPERIENCE</div>
+                <div class="mt-2 font-display text-3xl sm:text-4xl font-extrabold text-white">
+                  <span class="counter" data-target="300" data-decimals="0">0</span><span class="text-cyanGlow">+</span>
+                </div>
+                <div class="mt-1 text-xs text-slate-400">Events &amp; Exhibits</div>
+              </div>
+
+              <!-- Metric 5 -->
+              <div class="col-span-2 sm:col-span-2 glass-panel rounded-2xl p-5 hover:border-celestialGold/50 transition-colors">
+                <div class="font-mono text-[10px] tracking-[0.18em] text-celestialGold uppercase">GLOBAL</div>
+                <div class="mt-2 font-display text-3xl sm:text-4xl font-extrabold text-white">
+                  <span class="counter" data-target="20" data-decimals="0">0</span><span class="text-celestialGold">+</span>
+                </div>
+                <div class="mt-1 text-xs text-slate-400">Participating Countries</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ACT 3 — INTERACTIVE 3D COMPETITIONS SHOWCASE (FLAGSHIP ARENA)
+         ======================================================================= -->
+    <section id="act-3" data-act="2" class="relative flex min-h-screen flex-col justify-center px-4 sm:px-8 lg:px-14 py-24">
+      <div class="mx-auto w-full max-w-7xl">
+        <!-- Section Header -->
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 font-mono text-xs tracking-[0.25em] text-cyanGlow">
+              <span class="h-[1px] w-8 bg-cyanGlow"></span>
+              <span>ACT 03 // INTERACTIVE 3D ARTIFACT STAGE</span>
+            </div>
+            <h2 class="mt-2 font-display text-3xl sm:text-5xl font-bold text-white">
+              Flagship <span class="text-gradient-aether">Competitions</span>
+            </h2>
+          </div>
+          <div class="font-mono text-[11px] text-slate-400">
+            SELECT A COMPETITION TO WARP-SWAP THE LIVE 3D ARTIFACT
+          </div>
+        </div>
+
+        <!-- Split Layout: Left Interactive 3D Viewport Stage | Right Competition Selector Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+          <!-- LEFT: Dedicated Interactive 3D Viewport Zone (Direct Drag, Hover Raycast, Click Pulse) -->
+          <div class="lg:col-span-7 flex flex-col justify-between">
+            <div id="artifact-viewport-zone"
+              class="interactive-ui relative flex min-h-[360px] sm:min-h-[460px] lg:min-h-[540px] flex-col justify-between rounded-3xl border border-white/10 bg-obsidian/15 p-4 sm:p-5 select-none cursor-grab active:cursor-grabbing"
+              style="touch-action: none;">
+              <!-- HUD Corner Brackets -->
+              <div class="hud-bracket hud-tl"></div>
+              <div class="hud-bracket hud-tr"></div>
+              <div class="hud-bracket hud-bl"></div>
+              <div class="hud-bracket hud-br"></div>
+
+              <!-- Top Viewport Telemetry Strip -->
+              <div class="pointer-events-none flex items-center justify-between gap-2">
+                <div class="glass-panel rounded-xl px-3 py-1.5 font-mono text-[10px] sm:text-xs">
+                  <span class="text-slate-400">ARTIFACT:</span>
+                  <span id="stage-model-code" class="ml-1 font-semibold text-cyanGlow">TF26-ROBOWARS // MK-IV</span>
+                </div>
+                <div id="raycast-badge" class="glass-panel flex items-center gap-2 rounded-xl px-3 py-1.5 font-mono text-[10px] sm:text-xs text-slate-300 transition-colors">
+                  <span id="raycast-dot" class="h-2 w-2 rounded-full bg-slate-500 transition-colors"></span>
+                  <span id="raycast-text">DRAG TO ROTATE • CLICK TO PULSE</span>
+                </div>
+              </div>
+
+              <!-- Center subtle interaction prompt -->
+              <div id="stage-pulse-flash" class="pointer-events-none self-center font-mono text-[11px] tracking-[0.28em] text-cyanGlow opacity-0 transition-opacity duration-300">
+                // KINETIC SHOCKWAVE EMITTED //
+              </div>
+
+              <!-- Floating 3D Control Dock -->
+              <div class="pointer-events-auto mt-auto flex flex-wrap items-center justify-center gap-2 rounded-2xl glass-panel p-2">
+                <button id="ctrl-explode" type="button" class="dock-btn glass-btn flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] sm:text-xs text-slate-200 hover:border-cyanGlow/50">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span>Explode View</span>
+                </button>
+
+                <button id="ctrl-wireframe" type="button" class="dock-btn glass-btn flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] sm:text-xs text-slate-200 hover:border-cyanGlow/50">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+                    <line x1="12" y1="22" x2="12" y2="15.5" />
+                    <polyline points="22 8.5 12 15.5 2 8.5" />
+                  </svg>
+                  <span>Hologram</span>
+                </button>
+
+                <button id="ctrl-pulse" type="button" class="dock-btn glass-btn flex items-center gap-1.5 rounded-xl border border-celestialGold/35 bg-celestialGold/10 px-3 py-2 font-mono text-[10px] sm:text-xs text-celestialGold hover:border-celestialGold">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <circle cx="12" cy="12" r="8" stroke-dasharray="4 3" />
+                  </svg>
+                  <span>Energy Pulse</span>
+                </button>
+
+                <button id="ctrl-autospin" type="button" class="dock-btn active glass-btn flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] sm:text-xs text-slate-200 hover:border-cyanGlow/50">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke-linecap="round" />
+                    <polyline points="21 3 21 9 15 9" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span>Auto-Spin</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: 4 Flagship Competition Cards -->
+          <div class="lg:col-span-5 flex flex-col gap-3.5 interactive-ui">
+            <!-- Card 1: International Robowars -->
+            <button type="button" data-comp="robowars" class="comp-card active group w-full text-left glass-panel rounded-2xl p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2 font-mono text-[10px] tracking-widest text-celestialGold">
+                    <span>01 // COMBAT ROBOTICS</span>
+                  </div>
+                  <h3 class="mt-1 font-heading text-lg sm:text-xl font-bold text-white group-hover:text-cyanGlow transition-colors">
+                    International Robowars
+                  </h3>
+                </div>
+                <span class="shrink-0 rounded-lg border border-celestialGold/40 bg-celestialGold/10 px-2.5 py-1 font-mono text-xs font-bold text-celestialGold">
+                  ₹10,00,000
+                </span>
+              </div>
+              <p class="mt-2 text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                Titanium wedges, high-RPM vertical weapon drums, and armored combat machines colliding inside IIT Bombay’s bulletproof battlecage.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">8kg</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">15kg</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">30kg</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-celestialGold">60kg Heavyweight</span>
+              </div>
+            </button>
+
+            <!-- Card 2: Drone Soccer -->
+            <button type="button" data-comp="dronesoccer" class="comp-card group w-full text-left glass-panel rounded-2xl p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2 font-mono text-[10px] tracking-widest text-cyanGlow">
+                    <span>02 // AERIAL ROBOTICS</span>
+                  </div>
+                  <h3 class="mt-1 font-heading text-lg sm:text-xl font-bold text-white group-hover:text-cyanGlow transition-colors">
+                    Drone Soccer
+                  </h3>
+                </div>
+                <span class="shrink-0 rounded-lg border border-cyanGlow/40 bg-cyanGlow/10 px-2.5 py-1 font-mono text-xs font-bold text-cyanGlow">
+                  ₹80,000
+                </span>
+              </div>
+              <p class="mt-2 text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                Full-contact spherical geodesic quadcopters executing precision aerial strikes and defensive blocks in an illuminated caged arena.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">Class 200 Caged Arena</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-slate-300">5v5 Tactical Flight</span>
+              </div>
+            </button>
+
+            <!-- Card 3: AgentX & AI Hackathons -->
+            <button type="button" data-comp="agentx" class="comp-card group w-full text-left glass-panel rounded-2xl p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2 font-mono text-[10px] tracking-widest text-plasmaViolet">
+                    <span>03 // AUTONOMOUS INTELLIGENCE</span>
+                  </div>
+                  <h3 class="mt-1 font-heading text-lg sm:text-xl font-bold text-white group-hover:text-plasmaViolet transition-colors">
+                    AgentX &amp; AI Hackathons
+                  </h3>
+                </div>
+                <span class="shrink-0 rounded-lg border border-plasmaViolet/50 bg-plasmaViolet/15 px-2.5 py-1 font-mono text-xs font-bold text-purple-300">
+                  ₹1,50,000
+                </span>
+              </div>
+              <p class="mt-2 text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                Architect multi-agent reasoning lattices and autonomous orchestration pipelines solving high-stakes real-world enterprise challenges.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-purple-300">Agentic Commerce</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">AyushTech</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-celestialGold">BFSI</span>
+              </div>
+            </button>
+
+            <!-- Card 4: InnovateX -->
+            <button type="button" data-comp="innovatex" class="comp-card group w-full text-left glass-panel rounded-2xl p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2 font-mono text-[10px] tracking-widest text-emerald-400">
+                    <span>04 // SUSTAINABILITY CHALLENGE</span>
+                  </div>
+                  <h3 class="mt-1 font-heading text-lg sm:text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+                    InnovateX
+                  </h3>
+                </div>
+                <span class="shrink-0 rounded-lg border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-1 font-mono text-xs font-bold text-emerald-300">
+                  GLOBAL IMPACT
+                </span>
+              </div>
+              <p class="mt-2 text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                Deployable hardware &amp; sensor-network engineering addressing planetary-scale environmental resilience across India and beyond.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-emerald-300">Groundwater</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-cyanGlow">Urban AQI</span>
+                <span class="rounded-md bg-white/10 px-2 py-0.5 text-celestialGold">Marine Plastic</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ACT 4 — 3-DAY SCHEDULE & IIT BOMBAY CAMPUS EXPERIENCE
+         ======================================================================= -->
+    <section id="act-4" data-act="3" class="relative flex min-h-screen items-center px-4 sm:px-8 lg:px-14 py-24">
+      <div class="mx-auto w-full max-w-7xl">
+        <div class="mb-8">
+          <div class="flex items-center gap-3 font-mono text-xs tracking-[0.25em] text-plasmaViolet">
+            <span class="h-[1px] w-8 bg-plasmaViolet"></span>
+            <span>ACT 04 // POWAI HORIZON &amp; FESTIVAL CHRONOLOGY</span>
+          </div>
+          <h2 class="mt-2 font-display text-3xl sm:text-5xl font-bold text-white">
+            3 Days at <span class="text-gradient-aether">IIT Bombay</span>
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left: Interactive 3-Day Schedule Timeline -->
+          <div class="lg:col-span-7 interactive-ui glass-panel rounded-3xl p-5 sm:p-7">
+            <!-- Day Switcher Tabs -->
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+              <button type="button" data-day="day1" class="day-tab active glass-btn rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left transition-all">
+                <div class="font-mono text-[10px] text-cyanGlow">DAY 01</div>
+                <div class="font-heading text-sm sm:text-base font-bold text-white">16 DEC</div>
+                <div class="hidden sm:block text-[11px] text-slate-400">Ignition</div>
+              </button>
+              <button type="button" data-day="day2" class="day-tab glass-btn rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left transition-all">
+                <div class="font-mono text-[10px] text-celestialGold">DAY 02</div>
+                <div class="font-heading text-sm sm:text-base font-bold text-white">17 DEC</div>
+                <div class="hidden sm:block text-[11px] text-slate-400">Ascension</div>
+              </button>
+              <button type="button" data-day="day3" class="day-tab glass-btn rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left transition-all">
+                <div class="font-mono text-[10px] text-plasmaViolet">DAY 03</div>
+                <div class="font-heading text-sm sm:text-base font-bold text-white">18 DEC</div>
+                <div class="hidden sm:block text-[11px] text-slate-400">Apotheosis</div>
+              </button>
+            </div>
+
+            <!-- Timeline Events Container -->
+            <div id="timeline-content" class="mt-6 space-y-3.5">
+              <!-- Populated dynamically via JS for smooth animated switching -->
+            </div>
+          </div>
+
+          <!-- Right: Campus Accommodation & Visitor Info Card -->
+          <div class="lg:col-span-5 interactive-ui flex flex-col gap-5">
+            <div class="glass-panel-gold rounded-3xl p-6 sm:p-7">
+              <div class="flex items-center justify-between gap-2">
+                <span class="rounded-full border border-celestialGold/50 bg-celestialGold/15 px-3 py-1 font-mono text-[10px] font-semibold tracking-widest text-celestialGold">
+                  CAMPUS HOSPITALITY
+                </span>
+                <span class="font-mono text-xs text-slate-300">15–19 DEC 2026</span>
+              </div>
+
+              <h3 class="mt-4 font-display text-2xl sm:text-3xl font-bold text-white">
+                IIT Bombay Campus Stay
+              </h3>
+              <p class="mt-2 text-sm text-slate-300 leading-relaxed">
+                Live inside the lush Powai campus alongside 35,000+ innovators for <strong class="text-white">4 Days &amp; 4 Nights</strong> with dedicated hostel accommodation, shuttle transit, and front-row night concert access.
+              </p>
+
+              <div class="mt-5 flex items-baseline justify-between rounded-2xl border border-celestialGold/30 bg-obsidian/60 p-4">
+                <div>
+                  <div class="font-mono text-[10px] text-slate-400 uppercase">4 DAYS &amp; 4 NIGHTS PACKAGE</div>
+                  <div class="font-display text-3xl font-extrabold text-celestialGold">₹3,999</div>
+                </div>
+                <div class="text-right font-mono text-[11px] text-cyanGlow">
+                  <div>HOSTEL + KIT</div>
+                  <div class="text-slate-400">ALL-ACCESS PRONITES</div>
+                </div>
+              </div>
+
+              <!-- Visitor Free Entry Banner -->
+              <div class="mt-4 flex items-start gap-3 rounded-2xl border border-cyanGlow/30 bg-cyanGlow/5 p-4">
+                <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-cyanGlow/15 text-cyanGlow">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="12" cy="12" r="9" />
+                  </svg>
+                </div>
+                <div class="text-xs sm:text-sm text-slate-200">
+                  <div class="font-semibold text-cyanGlow">Free Festival Entry</div>
+                  <div class="mt-0.5 text-slate-300">Day visitors enter Techfest exhibitions, lectures &amp; competitions free with a valid Govt or College Photo ID.</div>
+                </div>
+              </div>
+
+              <a href="#act-5" class="glass-btn mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-celestialGold to-[#ffd372] py-3.5 font-heading text-sm font-bold tracking-wider text-obsidian shadow-[0_0_24px_rgba(245,185,66,0.3)]">
+                <span>RESERVE VISITOR PASS</span>
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ACT 5 — PORTAL GATE & INTERACTIVE 3D HOLOGRAPHIC PASS GENERATOR
+         ======================================================================= -->
+    <section id="act-5" data-act="4" class="relative flex min-h-screen flex-col justify-center px-4 sm:px-8 lg:px-14 pt-24 pb-16">
+      <div class="mx-auto w-full max-w-7xl">
+        <div class="mb-8 text-center">
+          <div class="inline-flex items-center gap-3 font-mono text-xs tracking-[0.25em] text-cyanGlow">
+            <span class="h-[1px] w-8 bg-cyanGlow"></span>
+            <span>ACT 05 // STARGATE ACCESS PORTAL</span>
+            <span class="h-[1px] w-8 bg-cyanGlow"></span>
+          </div>
+          <h2 class="mt-2 font-display text-3xl sm:text-5xl font-bold text-white">
+            Mint Your <span class="text-gradient-gold">Holographic Pass</span>
+          </h2>
+          <p class="mx-auto mt-3 max-w-xl text-sm sm:text-base text-slate-300">
+            Configure your digital Techfest '26 credential below to generate a live interactive 3D holographic visitor badge with your unique festival ID.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <!-- Left: Pass Minting Form -->
+          <div class="lg:col-span-6 interactive-ui">
+            <form id="pass-form" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-5">
+              <div>
+                <label for="pass-name" class="block font-mono text-[11px] tracking-widest text-cyanGlow uppercase mb-2">
+                  Full Name
+                </label>
+                <input id="pass-name" type="text" maxlength="32" required placeholder="e.g. Aarav Kulkarni"
+                  class="w-full rounded-xl border border-white/15 bg-obsidian/70 px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 focus:border-cyanGlow focus:outline-none focus:ring-1 focus:ring-cyanGlow transition-all" />
+              </div>
+
+              <div>
+                <label for="pass-org" class="block font-mono text-[11px] tracking-widest text-celestialGold uppercase mb-2">
+                  College / Organization
+                </label>
+                <input id="pass-org" type="text" maxlength="42" required placeholder="e.g. IIT Bombay / NIT Surathkal"
+                  class="w-full rounded-xl border border-white/15 bg-obsidian/70 px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 focus:border-celestialGold focus:outline-none focus:ring-1 focus:ring-celestialGold transition-all" />
+              </div>
+
+              <div>
+                <span class="block font-mono text-[11px] tracking-widest text-plasmaViolet uppercase mb-2.5">
+                  Select Interest Track
+                </span>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button type="button" data-track="Robotics" class="track-pill active glass-btn rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 font-mono text-xs text-slate-200">
+                    Robotics
+                  </button>
+                  <button type="button" data-track="AI & Cloud" class="track-pill glass-btn rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 font-mono text-xs text-slate-200">
+                    AI &amp; Cloud
+                  </button>
+                  <button type="button" data-track="Drones" class="track-pill glass-btn rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 font-mono text-xs text-slate-200">
+                    Drones
+                  </button>
+                  <button type="button" data-track="Sustainability" class="track-pill glass-btn rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 font-mono text-xs text-slate-200">
+                    Sustainability
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="glass-btn w-full rounded-2xl bg-gradient-to-r from-cyanGlow via-[#38d9ff] to-celestialGold py-3.5 font-heading text-sm sm:text-base font-bold tracking-wider text-obsidian shadow-[0_0_30px_rgba(0,240,255,0.35)] hover:shadow-[0_0_40px_rgba(245,185,66,0.5)]">
+                MINT TECHFEST '26 PASS
+              </button>
+            </form>
+          </div>
+
+          <!-- Right: Live Interactive 3D-Tilting Holographic Badge -->
+          <div class="lg:col-span-6 interactive-ui flex flex-col items-center">
+            <div class="holo-stage w-full max-w-[440px]">
+              <div id="holo-card" class="holo-card rounded-3xl p-6 sm:p-7 select-none">
+                <!-- Iridescent Shimmer Layer -->
+                <div class="holo-foil"></div>
+
+                <!-- Astrolabe Watermark SVG -->
+                <svg viewBox="0 0 200 200" class="holo-watermark">
+                  <circle cx="100" cy="100" r="92" fill="none" stroke="#f5b942" stroke-width="1.5" stroke-dasharray="6 5" />
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="#00f0ff" stroke-width="1.5" />
+                  <polygon points="100,15 174,142 26,142" fill="none" stroke="#f5b942" stroke-width="1.2" />
+                  <polygon points="100,185 174,58 26,58" fill="none" stroke="#00f0ff" stroke-width="1.2" />
+                </svg>
+
+                <!-- Badge Header -->
+                <div class="relative z-10 flex items-start justify-between gap-3 border-b border-white/15 pb-4">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full bg-cyanGlow shadow-[0_0_8px_#00f0ff]"></span>
+                      <span class="font-mono text-[10px] tracking-[0.22em] text-cyanGlow">OFFICIAL VISITOR CREDENTIAL</span>
+                    </div>
+                    <div class="mt-1 font-display text-xl sm:text-2xl font-extrabold tracking-wide text-white">
+                      TECHFEST <span class="text-celestialGold">'26</span>
+                    </div>
+                    <div class="font-mono text-[10px] tracking-[0.18em] text-slate-400">
+                      30TH EDITION • AN AETHERIAL RENAISSANCE
+                    </div>
+                  </div>
+                  <div class="rounded-xl border border-celestialGold/45 bg-celestialGold/10 px-2.5 py-1.5 text-right font-mono">
+                    <div class="text-[9px] text-celestialGold/80">PASS ID</div>
+                    <div id="badge-id" class="text-xs sm:text-sm font-bold text-white">TF26-8492</div>
+                  </div>
+                </div>
+
+                <!-- Badge Attendee Details -->
+                <div class="relative z-10 mt-5 flex items-end justify-between gap-4">
+                  <div class="min-w-0 flex-1 space-y-3">
+                    <div>
+                      <div class="font-mono text-[9px] tracking-[0.2em] text-slate-400">BEARER NAME</div>
+                      <div id="badge-name" class="truncate font-heading text-xl sm:text-2xl font-bold text-white">
+                        AARAV KULKARNI
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="font-mono text-[9px] tracking-[0.2em] text-slate-400">AFFILIATION</div>
+                      <div id="badge-org" class="truncate text-xs sm:text-sm font-medium text-slate-200">
+                        IIT Bombay, Powai
+                      </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                      <span id="badge-track" class="rounded-lg border border-cyanGlow/50 bg-cyanGlow/15 px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-cyanGlow uppercase">
+                        TRACK // ROBOTICS
+                      </span>
+                      <span class="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 font-mono text-[10px] text-slate-300">
+                        16–18 DEC 2026
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Procedural QR-Style Visual Matrix -->
+                  <div class="shrink-0 rounded-xl border border-white/20 bg-white/95 p-1.5 shadow-lg">
+                    <svg id="badge-qr" viewBox="0 0 21 21" class="h-16 w-16 sm:h-20 sm:w-20" shape-rendering="crispEdges"></svg>
+                  </div>
+                </div>
+
+                <!-- Badge Bottom Security Strip -->
+                <div class="relative z-10 mt-5 flex items-center justify-between border-t border-white/10 pt-3 font-mono text-[9px] tracking-[0.2em] text-slate-400">
+                  <span>IIT BOMBAY • POWAI, MUMBAI</span>
+                  <span class="text-celestialGold">HOLOGRAPHIC VERIFIED</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons below Holographic Card -->
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-3 w-full max-w-[440px]">
+              <button id="btn-download-pass" type="button" class="glass-btn flex-1 flex items-center justify-center gap-2 rounded-xl glass-panel-gold px-4 py-2.5 font-mono text-xs font-semibold text-celestialGold hover:text-white">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-linecap="round" stroke-linejoin="round" />
+                  <polyline points="7 10 12 15 17 10" stroke-linecap="round" stroke-linejoin="round" />
+                  <line x1="12" y1="15" x2="12" y2="3" stroke-linecap="round" />
+                </svg>
+                <span>DOWNLOAD PASS PNG</span>
+              </button>
+
+              <button id="btn-copy-pass" type="button" class="glass-btn flex-1 flex items-center justify-center gap-2 rounded-xl glass-panel px-4 py-2.5 font-mono text-xs font-semibold text-cyanGlow hover:border-cyanGlow/70 hover:text-white">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>COPY PASS ID</span>
+              </button>
+            </div>
+            <div class="mt-2 font-mono text-[10px] text-slate-400">
+              HOVER OR DRAG ACROSS BADGE FOR 3D FOIL TILT
+            </div>
+          </div>
+        </div>
+
+        <!-- Minimal Footer -->
+        <footer class="interactive-ui mt-20 border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-slate-400">
+          <div>
+            TECHFEST 2026 • 30TH EDITION • IIT BOMBAY, POWAI, MUMBAI
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-celestialGold/80">AN AETHERIAL RENAISSANCE</span>
+            <a href="#act-1" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-cyanGlow hover:border-cyanGlow transition-colors">
+              ↑ TOP ORBIT
+            </a>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       CORE APPLICATION JAVASCRIPT:
+       1. Web Audio API Sci-Fi Synthesizer
+       2. Three.js 5-Act 3D Engine & Procedural Artifacts
+       3. Interactive Scroll Choreography, Raycasting & Controls
+       4. Schedule Tabs, Legacy Counters & 3D Holographic Pass Generator
+       ========================================================================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* =======================================================================
+         1. SUBTLE WEB AUDIO API SCI-FI SOUND ENGINE (Zero External Audio URLs)
+         ======================================================================= */
+      const SoundEngine = {
+        ctx: null,
+        enabled: false,
+
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+
+        toggle() {
+          this.enabled = !this.enabled;
+          if (this.enabled) {
+            this.init();
+            this.playChime(520, 880, 0.16);
+          }
+          return this.enabled;
+        },
+
+        playClick() {
+          if (!this.enabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(760, now);
+          osc.frequency.exponentialRampToValueAtTime(340, now + 0.06);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.07);
+        },
+
+        playWarp() {
+          if (!this.enabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(640, now + 0.22);
+          osc.frequency.exponentialRampToValueAtTime(280, now + 0.42);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.08, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.46);
+        },
+
+        playPulse() {
+          if (!this.enabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(92, now + 0.35);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.38);
+        },
+
+        playChime(f1 = 440, f2 = 660, dur = 0.22) {
+          if (!this.enabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          [f1, f2].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            gain.gain.setValueAtTime(0.055, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + dur);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + dur + 0.02);
+          });
+        },
+      };
+
+      /* =======================================================================
+         HUD TOAST NOTIFICATION HELPER
+         ======================================================================= */
+      let toastTimer = null;
+      function showToast(message) {
+        const toast = document.getElementById('hud-toast');
+        const textEl = document.getElementById('hud-toast-text');
+        if (!toast || !textEl) return;
+        textEl.textContent = message;
+        toast.classList.remove('translate-y-16', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.add('translate-y-16', 'opacity-0');
+          toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 2800);
+      }
+
+      /* =======================================================================
+         2. THREE.JS 3D INTERACTIVE ENGINE (5 SCROLL ACTS + ARTIFACT STAGE)
+         ======================================================================= */
+      const Engine = {
+        scene: null,
+        camera: null,
+        renderer: null,
+        clock: null,
+
+        // Lighting
+        ambientLight: null,
+        keyLight: null,
+        rimLight: null,
+        fillLight: null,
+
+        // Global Particles
+        starField: null,
+
+        // Act Groups
+        astrolabeGroup: null,
+        astroRings: [],
+        coreMesh: null,
+        coreBasePos: null,
+        coreWire: null,
+        satellites: [],
+
+        stageRoot: null,
+        artifactPivot: null,
+        models: {},
+        activeCompKey: 'robowars',
+        swapState: { active: false, phase: 0, targetKey: 'robowars' },
+        pulseRings: [],
+
+        // Interactive Artifact Controls
+        explodeMode: false,
+        explodeFactor: 0,
+        wireframeMode: false,
+        autoSpin: true,
+        userRotY: 0,
+        userRotX: 0.14,
+        velY: 0,
+        velX: 0,
+        isDragging: false,
+        dragMoved: false,
+        lastPointer: { x: 0, y: 0 },
+
+        // Raycasting
+        raycaster: new THREE.Raycaster(),
+        pointerNDC: new THREE.Vector2(-10, -10),
+        isHoveringArtifact: false,
+
+        // Terrain (Act 4)
+        terrainGroup: null,
+        terrainGeo: null,
+        terrainBaseZ: null,
+        terrainPillars: [],
+
+        // Stargate (Act 5)
+        stargateGroup: null,
+        stargateRings: [],
+        warpBoost: 0,
+
+        // Scroll & Mouse Parallax
+        scrollTarget: 0, // 0..4 continuous across 5 acts
+        scrollCurrent: 0,
+        mouseNorm: { x: 0, y: 0 },
+        mouseSmooth: { x: 0, y: 0 },
+
+        // Competition metadata for lighting & telemetry
+        compMeta: {
+          robowars: { code: 'TF26-ROBOWARS // MK-IV', keyColor: 0x00f0ff, rimColor: 0xf5b942 },
+          dronesoccer: { code: 'TF26-DRONE // CLASS-200', keyColor: 0x00f0ff, rimColor: 0x22d3ee },
+          agentx: { code: 'TF26-AGENTX // NEURAL-LATTICE', keyColor: 0x8b5cf6, rimColor: 0x00f0ff },
+          innovatex: { code: 'TF26-INNOVATEX // ECO-GLOBE', keyColor: 0x10b981, rimColor: 0xf5b942 },
+        },
+
+        // Procedural glowing radial particle texture (zero external image URLs)
+        createGlowTexture(innerColor = '#ffffff', outerColor = 'rgba(0,240,255,0)') {
+          const size = 64;
+          const c = document.createElement('canvas');
+          c.width = size;
+          c.height = size;
+          const ctx = c.getContext('2d');
+          const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+          grad.addColorStop(0, innerColor);
+          grad.addColorStop(0.35, 'rgba(255,255,255,0.65)');
+          grad.addColorStop(1, outerColor);
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, size, size);
+          return new THREE.CanvasTexture(c);
+        },
+
+        init() {
+          try {
+            const canvas = document.getElementById('webgl-canvas');
+            this.scene = new THREE.Scene();
+            this.scene.fog = new THREE.FogExp2(0x04060e, 0.017);
+
+            this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 180);
+            this.camera.position.set(0, 0.3, 11.5);
+
+            this.renderer = new THREE.WebGLRenderer({
+              canvas,
+              antialias: true,
+              alpha: false,
+              powerPreference: 'high-performance',
+            });
+            this.renderer.setClearColor(0x04060e, 1);
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            this.renderer.toneMappingExposure = 1.18;
+
+            this.clock = new THREE.Clock();
+
+            this.setupLights();
+            this.buildStarfield();
+            this.buildAstrolabe();      // Act 1 & Act 2 (y = 0)
+            this.buildArtifactStage();  // Act 3 (y = -20)
+            this.buildTerrain();        // Act 4 (y = -40)
+            this.buildStargate();       // Act 5 (y = -62)
+
+            this.updateResponsiveStageOffset();
+            this.bindEvents();
+            return true;
+          } catch (err) {
+            console.error('WebGL Initialization Error:', err);
+            const fb = document.getElementById('webgl-fallback');
+            if (fb) fb.classList.remove('hidden');
+            return false;
+          }
+        },
+
+        setupLights() {
+          this.ambientLight = new THREE.AmbientLight(0x8aa4ff, 0.55);
+          this.scene.add(this.ambientLight);
+
+          this.keyLight = new THREE.PointLight(0x00f0ff, 2.4, 48);
+          this.keyLight.position.set(6, 5, 10);
+          this.scene.add(this.keyLight);
+
+          this.rimLight = new THREE.PointLight(0xf5b942, 2.2, 48);
+          this.rimLight.position.set(-7, -3, 8);
+          this.scene.add(this.rimLight);
+
+          this.fillLight = new THREE.PointLight(0x8b5cf6, 1.8, 48);
+          this.fillLight.position.set(0, 8, -8);
+          this.scene.add(this.fillLight);
+
+          const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+          dir.position.set(4, 10, 8);
+          this.scene.add(dir);
+        },
+
+        /* --- 2,500-Particle Multi-Tone Cosmic Starfield --- */
+        buildStarfield() {
+          const count = 2600;
+          const positions = new Float32Array(count * 3);
+          const colors = new Float32Array(count * 3);
+          const palette = [
+            new THREE.Color(0xffffff),
+            new THREE.Color(0x00f0ff),
+            new THREE.Color(0xf5b942),
+            new THREE.Color(0x8b5cf6),
+          ];
+
+          for (let i = 0; i < count; i++) {
+            const i3 = i * 3;
+            positions[i3] = (Math.random() - 0.5) * 85;
+            positions[i3 + 1] = Math.random() * 24 - 84; // spans across all 5 vertical acts
+            positions[i3 + 2] = (Math.random() - 0.5) * 70 - 8;
+
+            const c = palette[Math.floor(Math.random() * palette.length)];
+            colors[i3] = c.r;
+            colors[i3 + 1] = c.g;
+            colors[i3 + 2] = c.b;
+          }
+
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+          const mat = new THREE.PointsMaterial({
+            size: 0.24,
+            map: this.createGlowTexture(),
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          });
+
+          this.starField = new THREE.Points(geo, mat);
+          this.scene.add(this.starField);
+        },
+
+        /* --- ACT 1 & ACT 2: Centerpiece 3D Kinetic Astrolabe & Crystalline Core --- */
+        buildAstrolabe() {
+          this.astrolabeGroup = new THREE.Group();
+          this.astrolabeGroup.position.set(0, 0.2, 0);
+
+          const goldMat = new THREE.MeshStandardMaterial({
+            color: 0xf5b942,
+            metalness: 0.85,
+            roughness: 0.22,
+            emissive: 0x5c3a00,
+            emissiveIntensity: 0.45,
+          });
+          const cyanMat = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            metalness: 0.6,
+            roughness: 0.2,
+            emissive: 0x00a8c8,
+            emissiveIntensity: 0.7,
+          });
+          const violetMat = new THREE.MeshStandardMaterial({
+            color: 0x8b5cf6,
+            metalness: 0.7,
+            roughness: 0.25,
+            emissive: 0x4c1d95,
+            emissiveIntensity: 0.65,
+          });
+
+          // 3 Concentric Multi-Axis Gilded Astrolabe Rings
+          const ringSpecs = [
+            { radius: 3.45, tube: 0.048, mat: goldMat, ticks: 60, tilt: [0.22, 0.15, 0] },
+            { radius: 2.68, tube: 0.04, mat: cyanMat, ticks: 36, tilt: [-0.65, 0.45, 0.2] },
+            { radius: 1.98, tube: 0.036, mat: violetMat, ticks: 24, tilt: [0.85, -0.5, 0.4] },
+          ];
+
+          ringSpecs.forEach((spec, idx) => {
+            const rGroup = new THREE.Group();
+            rGroup.rotation.set(spec.tilt[0], spec.tilt[1], spec.tilt[2]);
+            rGroup.userData.baseTilt = new THREE.Euler(spec.tilt[0], spec.tilt[1], spec.tilt[2]);
+            rGroup.userData.ringIndex = idx;
+
+            const torus = new THREE.Mesh(new THREE.TorusGeometry(spec.radius, spec.tube, 20, 128), spec.mat);
+            rGroup.add(torus);
+
+            // Thin secondary engraved filigree ring
+            const innerFiligree = new THREE.Mesh(
+              new THREE.TorusGeometry(spec.radius - 0.14, 0.012, 12, 96),
+              new THREE.MeshBasicMaterial({ color: idx === 0 ? 0xf5b942 : 0x00f0ff, transparent: true, opacity: 0.45 })
+            );
+            rGroup.add(innerFiligree);
+
+            // Glowing radial tick marks around each astrolabe ring
+            const tickGeo = new THREE.BoxGeometry(0.026, idx === 0 ? 0.22 : 0.14, 0.026);
+            const tickMat = new THREE.MeshBasicMaterial({
+              color: idx === 1 ? 0x00f0ff : 0xf5b942,
+              transparent: true,
+              opacity: 0.85,
+            });
+            for (let t = 0; t < spec.ticks; t++) {
+              const angle = (t / spec.ticks) * Math.PI * 2;
+              const tick = new THREE.Mesh(tickGeo, tickMat);
+              const isMajor = t % 6 === 0;
+              tick.scale.y = isMajor ? 1.55 : 0.7;
+              tick.position.set(Math.cos(angle) * (spec.radius + 0.12), Math.sin(angle) * (spec.radius + 0.12), 0);
+              tick.rotation.z = angle - Math.PI / 2;
+              rGroup.add(tick);
+            }
+
+            this.astroRings.push(rGroup);
+            this.astrolabeGroup.add(rGroup);
+          });
+
+          // Morphing Faceted Glowing Icosahedron Core
+          const coreGeo = new THREE.IcosahedronGeometry(1.12, 1);
+          this.coreBasePos = new Float32Array(coreGeo.attributes.position.array);
+          const coreMat = new THREE.MeshStandardMaterial({
+            color: 0x0b1630,
+            emissive: 0x00f0ff,
+            emissiveIntensity: 0.55,
+            metalness: 0.85,
+            roughness: 0.18,
+            flatShading: true,
+          });
+          this.coreMesh = new THREE.Mesh(coreGeo, coreMat);
+          this.astrolabeGroup.add(this.coreMesh);
+
+          // Outer Counter-Rotating Wireframe Shell
+          this.coreWire = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(1.36, 1),
+            new THREE.MeshBasicMaterial({
+              color: 0xf5b942,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.55,
+            })
+          );
+          this.astrolabeGroup.add(this.coreWire);
+
+          // Central Holographic Glow Sprite
+          const glowSprite = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: this.createGlowTexture('#00f0ff', 'rgba(0,240,255,0)'),
+              color: 0x00f0ff,
+              transparent: true,
+              opacity: 0.52,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+            })
+          );
+          glowSprite.scale.set(4.5, 4.5, 1);
+          this.astrolabeGroup.add(glowSprite);
+
+          // 4 Orbiting Golden Satellites
+          for (let s = 0; s < 4; s++) {
+            const satPivot = new THREE.Group();
+            const satMesh = new THREE.Mesh(
+              new THREE.OctahedronGeometry(0.15, 0),
+              new THREE.MeshStandardMaterial({
+                color: 0xf5b942,
+                emissive: 0xf5b942,
+                emissiveIntensity: 0.75,
+                metalness: 0.9,
+                roughness: 0.2,
+              })
+            );
+            const satHalo = new THREE.Mesh(
+              new THREE.TorusGeometry(0.24, 0.014, 10, 32),
+              new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.7 })
+            );
+            satMesh.add(satHalo);
+
+            const radius = 3.9 + s * 0.36;
+            satMesh.position.set(radius, 0, 0);
+            satPivot.add(satMesh);
+            satPivot.userData = {
+              speed: 0.38 + s * 0.14,
+              phase: (s * Math.PI) / 2,
+              tiltX: (s - 1.5) * 0.35,
+              tiltZ: (s % 2 === 0 ? 1 : -1) * 0.25,
+            };
+            this.satellites.push(satPivot);
+            this.astrolabeGroup.add(satPivot);
+          }
+
+          this.scene.add(this.astrolabeGroup);
+        },
+
+        /* --- Helper to register sub-components for smooth Explode View --- */
+        registerPart(parent, mesh, explodeVec) {
+          mesh.userData.basePos = mesh.position.clone();
+          mesh.userData.explodeVec = explodeVec.clone();
+          parent.add(mesh);
+          return mesh;
+        },
+
+        /* --- ACT 3: Dedicated Interactive 3D Artifact Stage --- */
+        buildArtifactStage() {
+          this.stageRoot = new THREE.Group();
+          this.stageRoot.position.set(-1.9, -20, 0);
+
+          // Holographic Stage Pedestal Rings
+          const pedestal = new THREE.Group();
+          pedestal.position.set(0, -2.15, 0);
+
+          const pedRing1 = new THREE.Mesh(
+            new THREE.TorusGeometry(2.35, 0.025, 16, 96),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.55 })
+          );
+          pedRing1.rotation.x = Math.PI / 2;
+          pedestal.add(pedRing1);
+
+          const pedRing2 = new THREE.Mesh(
+            new THREE.TorusGeometry(1.75, 0.015, 12, 72),
+            new THREE.MeshBasicMaterial({ color: 0xf5b942, transparent: true, opacity: 0.45 })
+          );
+          pedRing2.rotation.x = Math.PI / 2;
+          pedestal.add(pedRing2);
+
+          const pedGrid = new THREE.PolarGridHelper(2.4, 12, 4, 64, 0x00f0ff, 0x1e293b);
+          pedGrid.material.transparent = true;
+          pedGrid.material.opacity = 0.28;
+          pedestal.add(pedGrid);
+
+          this.stageRoot.add(pedestal);
+
+          // Pivot Group holding the swappable 3D competition models
+          this.artifactPivot = new THREE.Group();
+          this.stageRoot.add(this.artifactPivot);
+
+          // Build all 4 procedural competition artifacts
+          this.models.robowars = this.buildRobowarsModel();
+          this.models.dronesoccer = this.buildDroneSoccerModel();
+          this.models.agentx = this.buildAgentXModel();
+          this.models.innovatex = this.buildInnovateXModel();
+
+          Object.keys(this.models).forEach((key) => {
+            this.models[key].visible = key === this.activeCompKey;
+            this.artifactPivot.add(this.models[key]);
+          });
+
+          this.scene.add(this.stageRoot);
+        },
+
+        /* --- 3A. PROCEDURAL 3D COMBAT ROBOT (International Robowars) --- */
+        buildRobowarsModel() {
+          const group = new THREE.Group();
+          group.userData.type = 'robowars';
+
+          const armorDark = new THREE.MeshStandardMaterial({
+            color: 0x182032,
+            metalness: 0.85,
+            roughness: 0.28,
+          });
+          const armorGold = new THREE.MeshStandardMaterial({
+            color: 0xf5b942,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0x4d3000,
+            emissiveIntensity: 0.35,
+          });
+          const neonCyan = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            emissive: 0x00f0ff,
+            emissiveIntensity: 1.2,
+            roughness: 0.2,
+          });
+          const weaponSteel = new THREE.MeshStandardMaterial({
+            color: 0xdbeafe,
+            metalness: 0.95,
+            roughness: 0.15,
+          });
+
+          // Core Internal Power Reactor (revealed beautifully in Explode View)
+          const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), neonCyan);
+          core.position.set(0, 0.15, -0.15);
+          this.registerPart(group, core, new THREE.Vector3(0, 0.35, 0));
+
+          // Main Armored Chassis Body
+          const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.56, 2.2), armorDark);
+          chassis.position.set(0, 0, -0.15);
+          this.registerPart(group, chassis, new THREE.Vector3(0, 0, -0.2));
+
+          // Top Sloped Armor Plate + Roll Cage
+          const topPlate = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.18, 1.75), armorGold);
+          topPlate.position.set(0, 0.36, -0.2);
+          this.registerPart(group, topPlate, new THREE.Vector3(0, 1.15, -0.2));
+
+          // Front Angled Combat Wedge
+          const wedge = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.95, 1.95, 3), armorDark);
+          wedge.rotation.z = Math.PI / 2;
+          wedge.rotation.x = Math.PI / 6;
+          wedge.scale.set(0.48, 1, 0.95);
+          wedge.position.set(0, -0.05, 1.25);
+          this.registerPart(group, wedge, new THREE.Vector3(0, -0.25, 1.1));
+
+          // Left & Right Armored Neon Treads
+          [-1.12, 1.12].forEach((xPos) => {
+            const treadGroup = new THREE.Group();
+            treadGroup.position.set(xPos, -0.12, -0.1);
+
+            const trackHull = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.62, 2.55), armorDark);
+            treadGroup.add(trackHull);
+
+            // Neon Side Trim Strip
+            const trim = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.1, 2.3), neonCyan);
+            treadGroup.add(trim);
+
+            // 4 Drive Wheels per side
+            for (let w = 0; w < 4; w++) {
+              const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.44, 16), armorGold);
+              wheel.rotation.z = Math.PI / 2;
+              wheel.position.set(0, -0.12, -0.9 + w * 0.6);
+              treadGroup.add(wheel);
+            }
+
+            this.registerPart(group, treadGroup, new THREE.Vector3(xPos * 0.95, -0.15, 0));
+          });
+
+          // High-Speed Spinning Vertical Kinetic Weapon Drum
+          const drumAssembly = new THREE.Group();
+          drumAssembly.position.set(0, 0.14, 1.28);
+
+          const drumCore = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 1.28, 24), weaponSteel);
+          drumCore.rotation.z = Math.PI / 2;
+          drumAssembly.add(drumCore);
+
+          // Forged Weapon Teeth around the drum
+          for (let t = 0; t < 8; t++) {
+            const ang = (t / 8) * Math.PI * 2;
+            const tooth = new THREE.Mesh(new THREE.BoxGeometry(1.18, 0.16, 0.22), t % 2 === 0 ? armorGold : neonCyan);
+            tooth.position.set(0, Math.cos(ang) * 0.46, Math.sin(ang) * 0.46);
+            tooth.rotation.x = ang;
+            drumAssembly.add(tooth);
+          }
+
+          group.userData.weaponDrum = drumAssembly;
+          this.registerPart(group, drumAssembly, new THREE.Vector3(0, 0.55, 1.35));
+
+          // Rear Stabilizer Spoiler
+          const spoiler = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.12, 0.42), armorGold);
+          spoiler.position.set(0, 0.62, -1.25);
+          spoiler.rotation.x = -0.3;
+          this.registerPart(group, spoiler, new THREE.Vector3(0, 0.9, -1.1));
+
+          group.scale.setScalar(1.05);
+          return group;
+        },
+
+        /* --- 3B. PROCEDURAL 3D SPHERICAL DRONE SOCCER (Class 200 Caged Arena) --- */
+        buildDroneSoccerModel() {
+          const group = new THREE.Group();
+          group.userData.type = 'dronesoccer';
+          group.userData.rotors = [];
+
+          const carbonMat = new THREE.MeshStandardMaterial({
+            color: 0x111827,
+            metalness: 0.75,
+            roughness: 0.3,
+          });
+          const neonCyan = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            emissive: 0x00f0ff,
+            emissiveIntensity: 1.15,
+            roughness: 0.2,
+          });
+          const neonGold = new THREE.MeshStandardMaterial({
+            color: 0xf5b942,
+            emissive: 0xf5b942,
+            emissiveIntensity: 0.8,
+            metalness: 0.6,
+            roughness: 0.25,
+          });
+
+          // Outer Spherical Geodesic Protective Cage (Top & Bottom hemispheres for Explode View)
+          const cageOuter = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(1.75, 1),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.72 })
+          );
+          this.registerPart(group, cageOuter, new THREE.Vector3(0, 0.85, 0));
+
+          const cageInner = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(1.66, 1),
+            new THREE.MeshBasicMaterial({ color: 0xf5b942, wireframe: true, transparent: true, opacity: 0.35 })
+          );
+          cageInner.rotation.y = 0.4;
+          this.registerPart(group, cageInner, new THREE.Vector3(0, -0.85, 0));
+
+          // Glowing Equator Bumper Ring
+          const bumper = new THREE.Mesh(new THREE.TorusGeometry(1.76, 0.055, 16, 72), neonCyan);
+          bumper.rotation.x = Math.PI / 2;
+          this.registerPart(group, bumper, new THREE.Vector3(0, 0, 0.7));
+
+          // Central Quadcopter Flight Controller Hub
+          const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 0.28, 8), carbonMat);
+          this.registerPart(group, hub, new THREE.Vector3(0, 0, 0));
+
+          const fcLed = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.32, 16), neonGold);
+          this.registerPart(group, fcLed, new THREE.Vector3(0, 0.55, 0));
+
+          // 4 Quadcopter Arms + Rapidly Spinning Glowing Rotors
+          const angles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
+          angles.forEach((ang, idx) => {
+            const armGroup = new THREE.Group();
+            const dirX = Math.cos(ang);
+            const dirZ = Math.sin(ang);
+
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 0.14), carbonMat);
+            arm.position.set(dirX * 0.52, 0, dirZ * 0.52);
+            arm.rotation.y = -ang;
+            armGroup.add(arm);
+
+            // Motor Pod
+            const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.22, 16), neonGold);
+            motor.position.set(dirX * 0.96, 0.06, dirZ * 0.96);
+            armGroup.add(motor);
+
+            // Spinning Rotor Assembly (Blades + Glowing Blur Disk)
+            const rotor = new THREE.Group();
+            rotor.position.set(dirX * 0.96, 0.21, dirZ * 0.96);
+
+            const blade1 = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.02, 0.09), neonCyan);
+            const blade2 = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.02, 0.76), neonCyan);
+            const blurDisc = new THREE.Mesh(
+              new THREE.RingGeometry(0.12, 0.42, 24),
+              new THREE.MeshBasicMaterial({
+                color: idx % 2 === 0 ? 0x00f0ff : 0xf5b942,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.42,
+              })
+            );
+            blurDisc.rotation.x = Math.PI / 2;
+            rotor.add(blade1, blade2, blurDisc);
+            armGroup.add(rotor);
+
+            group.userData.rotors.push(rotor);
+            this.registerPart(group, armGroup, new THREE.Vector3(dirX * 1.1, 0.25, dirZ * 1.1));
+          });
+
+          return group;
+        },
+
+        /* --- 3C. PROCEDURAL 3D NEURAL NETWORK LATTICE (AgentX & AI Hackathons) --- */
+        buildAgentXModel() {
+          const group = new THREE.Group();
+          group.userData.type = 'agentx';
+          group.userData.pulses = [];
+          group.userData.dataCubes = [];
+
+          const nodePositions = [];
+          const layerX = [-1.45, -0.48, 0.48, 1.45];
+          const layerCounts = [4, 6, 6, 4];
+          const layerColors = [0x00f0ff, 0x8b5cf6, 0x00f0ff, 0xf5b942];
+
+          const layers = [];
+          layerX.forEach((lx, lIdx) => {
+            const count = layerCounts[lIdx];
+            const pts = [];
+            const radius = lIdx === 1 || lIdx === 2 ? 1.15 : 0.82;
+            for (let i = 0; i < count; i++) {
+              const ang = (i / count) * Math.PI * 2 + lIdx * 0.45;
+              const y = Math.cos(ang) * radius;
+              const z = Math.sin(ang) * radius;
+              const pos = new THREE.Vector3(lx, y, z);
+              pts.push(pos);
+              nodePositions.push(pos);
+
+              const node = new THREE.Mesh(
+                new THREE.SphereGeometry(0.13, 16, 16),
+                new THREE.MeshStandardMaterial({
+                  color: layerColors[lIdx],
+                  emissive: layerColors[lIdx],
+                  emissiveIntensity: 1.1,
+                  roughness: 0.2,
+                })
+              );
+              node.position.copy(pos);
+              this.registerPart(group, node, pos.clone().multiplyScalar(0.55));
+            }
+            layers.push(pts);
+          });
+
+          // Synaptic Light Connections between consecutive layers
+          const lineCoords = [];
+          const synapsePairs = [];
+          for (let l = 0; l < layers.length - 1; l++) {
+            layers[l].forEach((p1) => {
+              layers[l + 1].forEach((p2, idx2) => {
+                if ((idx2 + l) % 2 === 0 || p1.distanceTo(p2) < 1.95) {
+                  lineCoords.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+                  synapsePairs.push({ from: p1, to: p2 });
+                }
+              });
+            });
+          }
+
+          const lineGeo = new THREE.BufferGeometry();
+          lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineCoords, 3));
+          const synapses = new THREE.LineSegments(
+            lineGeo,
+            new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.48 })
+          );
+          this.registerPart(group, synapses, new THREE.Vector3(0, 0, 0));
+
+          // Animated Pulsing Light Packets traveling along Synapses
+          for (let p = 0; p < 14; p++) {
+            const pair = synapsePairs[p % synapsePairs.length];
+            const packet = new THREE.Mesh(
+              new THREE.SphereGeometry(0.055, 8, 8),
+              new THREE.MeshBasicMaterial({ color: p % 2 === 0 ? 0x00f0ff : 0xf5b942 })
+            );
+            packet.userData = {
+              from: pair.from,
+              to: pair.to,
+              t: Math.random(),
+              speed: 0.45 + Math.random() * 0.55,
+            };
+            group.add(packet);
+            group.userData.pulses.push(packet);
+          }
+
+          // Central Quantum Tensor Core
+          const core = new THREE.Mesh(
+            new THREE.OctahedronGeometry(0.46, 0),
+            new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              emissive: 0x8b5cf6,
+              emissiveIntensity: 1.2,
+              wireframe: true,
+            })
+          );
+          this.registerPart(group, core, new THREE.Vector3(0, 0.95, 0));
+
+          // Orbiting Holographic Data Cubes
+          for (let c = 0; c < 6; c++) {
+            const cube = new THREE.Mesh(
+              new THREE.BoxGeometry(0.24, 0.24, 0.24),
+              new THREE.MeshStandardMaterial({
+                color: 0x0f172a,
+                emissive: c % 2 === 0 ? 0x00f0ff : 0xf5b942,
+                emissiveIntensity: 0.75,
+                metalness: 0.8,
+                roughness: 0.2,
+              })
+            );
+            const ang = (c / 6) * Math.PI * 2;
+            cube.position.set(Math.cos(ang) * 1.95, Math.sin(ang * 2) * 0.65, Math.sin(ang) * 1.95);
+            cube.userData.orbitAngle = ang;
+            this.registerPart(group, cube, cube.position.clone().multiplyScalar(0.45));
+            group.userData.dataCubes.push(cube);
+          }
+
+          return group;
+        },
+
+        /* --- 3D. PROCEDURAL HOLOGRAPHIC ECO-GLOBE (InnovateX Sustainability) --- */
+        buildInnovateXModel() {
+          const group = new THREE.Group();
+          group.userData.type = 'innovatex';
+          group.userData.beacons = [];
+          group.userData.bioRings = [];
+
+          // Translucent Inner Ocean Core
+          const coreSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1.18, 32, 24),
+            new THREE.MeshStandardMaterial({
+              color: 0x042f2e,
+              emissive: 0x059669,
+              emissiveIntensity: 0.42,
+              metalness: 0.4,
+              roughness: 0.35,
+              transparent: true,
+              opacity: 0.82,
+            })
+          );
+          this.registerPart(group, coreSphere, new THREE.Vector3(0, 0, 0));
+
+          // Glowing Latitude / Longitude Wireframe Meridian Shell
+          const latLonShell = new THREE.Mesh(
+            new THREE.SphereGeometry(1.3, 20, 14),
+            new THREE.MeshBasicMaterial({
+              color: 0x10b981,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.58,
+            })
+          );
+          this.registerPart(group, latLonShell, new THREE.Vector3(0, 0.55, 0));
+
+          // Outer Atmospheric Cyan Halo Shell
+          const atmoShell = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(1.42, 2),
+            new THREE.MeshBasicMaterial({
+              color: 0x00f0ff,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.2,
+            })
+          );
+          this.registerPart(group, atmoShell, new THREE.Vector3(0, -0.55, 0));
+
+          // Tilted Floating Orbital Biosphere Rings
+          const bioSpecs = [
+            { r: 1.78, color: 0xf5b942, tilt: [0.55, 0.2, 0.3] },
+            { r: 2.02, color: 0x10b981, tilt: [-0.65, 0.4, -0.25] },
+          ];
+          bioSpecs.forEach((spec, idx) => {
+            const ring = new THREE.Mesh(
+              new THREE.TorusGeometry(spec.r, 0.028, 14, 88),
+              new THREE.MeshStandardMaterial({
+                color: spec.color,
+                emissive: spec.color,
+                emissiveIntensity: 0.75,
+              })
+            );
+            ring.rotation.set(spec.tilt[0], spec.tilt[1], spec.tilt[2]);
+            this.registerPart(group, ring, new THREE.Vector3(0, idx === 0 ? 0.85 : -0.85, 0));
+            group.userData.bioRings.push(ring);
+          });
+
+          // 6 Floating Environmental Sensor Beacons (Groundwater, Urban AQI, Marine Plastic)
+          for (let b = 0; b < 6; b++) {
+            const phi = Math.acos(1 - (2 * (b + 0.5)) / 6);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * b;
+            const r = 1.62;
+            const pos = new THREE.Vector3(
+              r * Math.sin(phi) * Math.cos(theta),
+              r * Math.cos(phi),
+              r * Math.sin(phi) * Math.sin(theta)
+            );
+
+            const beacon = new THREE.Group();
+            beacon.position.copy(pos);
+
+            const pod = new THREE.Mesh(
+              new THREE.OctahedronGeometry(0.12, 0),
+              new THREE.MeshStandardMaterial({
+                color: b % 2 === 0 ? 0xf5b942 : 0x00f0ff,
+                emissive: b % 2 === 0 ? 0xf5b942 : 0x00f0ff,
+                emissiveIntensity: 1.1,
+              })
+            );
+            beacon.add(pod);
+
+            // Tiny scanner ring around each beacon
+            const scanRing = new THREE.Mesh(
+              new THREE.TorusGeometry(0.2, 0.012, 8, 24),
+              new THREE.MeshBasicMaterial({ color: 0x10b981 })
+            );
+            beacon.add(scanRing);
+
+            this.registerPart(group, beacon, pos.clone().normalize().multiplyScalar(0.95));
+            group.userData.beacons.push(beacon);
+          }
+
+          return group;
+        },
+
+        /* --- ACT 4: Animated 3D Cyber-Topographic Terrain Wave Grid (Powai Campus) --- */
+        buildTerrain() {
+          this.terrainGroup = new THREE.Group();
+          this.terrainGroup.position.set(0, -42.5, -4);
+
+          this.terrainGeo = new THREE.PlaneGeometry(46, 36, 54, 42);
+          this.terrainGeo.rotateX(-Math.PI / 2);
+
+          // Store base XZ for clean wave animation
+          const posAttr = this.terrainGeo.attributes.position;
+          this.terrainBaseZ = new Float32Array(posAttr.count * 2);
+          for (let i = 0; i < posAttr.count; i++) {
+            this.terrainBaseZ[i * 2] = posAttr.getX(i);
+            this.terrainBaseZ[i * 2 + 1] = posAttr.getZ(i);
+          }
+
+          const wireTerrain = new THREE.Mesh(
+            this.terrainGeo,
+            new THREE.MeshBasicMaterial({
+              color: 0x00f0ff,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.22,
+            })
+          );
+          this.terrainGroup.add(wireTerrain);
+
+          const pointTerrain = new THREE.Points(
+            this.terrainGeo,
+            new THREE.PointsMaterial({
+              color: 0x8b5cf6,
+              size: 0.14,
+              transparent: true,
+              opacity: 0.65,
+              blending: THREE.AdditiveBlending,
+            })
+          );
+          this.terrainGroup.add(pointTerrain);
+
+          // 16 Rising Light Pillars (IIT Bombay Campus Landmarks)
+          const pillarColors = [0x00f0ff, 0xf5b942, 0x8b5cf6];
+          for (let i = 0; i < 16; i++) {
+            const h = 2.6 + Math.random() * 4.5;
+            const col = pillarColors[i % pillarColors.length];
+            const px = (Math.random() - 0.5) * 26;
+            const pz = (Math.random() - 0.5) * 18 - 2;
+
+            const beam = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.03, 0.08, h, 8, 1, true),
+              new THREE.MeshBasicMaterial({
+                color: col,
+                transparent: true,
+                opacity: 0.55,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+              })
+            );
+            beam.position.set(px, h / 2, pz);
+
+            const cap = new THREE.Mesh(
+              new THREE.OctahedronGeometry(0.14, 0),
+              new THREE.MeshBasicMaterial({ color: col })
+            );
+            cap.position.set(0, h / 2 + 0.15, 0);
+            beam.add(cap);
+
+            beam.userData = { baseY: h / 2, phase: Math.random() * Math.PI * 2 };
+            this.terrainPillars.push(beam);
+            this.terrainGroup.add(beam);
+          }
+
+          this.scene.add(this.terrainGroup);
+        },
+
+        /* --- ACT 5: Hypnotic Rotating 3D Stargate / Warp Tunnel --- */
+        buildStargate() {
+          this.stargateGroup = new THREE.Group();
+          this.stargateGroup.position.set(0, -62, -2);
+
+          const ringCount = 18;
+          for (let i = 0; i < ringCount; i++) {
+            const color = i % 3 === 0 ? 0xf5b942 : i % 3 === 1 ? 0x00f0ff : 0x8b5cf6;
+            const radius = 3.9 + (i % 2) * 0.25;
+            const ring = new THREE.Group();
+            ring.position.z = -i * 2.15;
+
+            const torus = new THREE.Mesh(
+              new THREE.TorusGeometry(radius, 0.042, 12, 64),
+              new THREE.MeshBasicMaterial({
+                color,
+                transparent: true,
+                opacity: Math.max(0.15, 0.85 - i * 0.036),
+              })
+            );
+            ring.add(torus);
+
+            // Geometric Renaissance nodes on every second ring
+            if (i % 2 === 0) {
+              for (let n = 0; n < 8; n++) {
+                const a = (n / 8) * Math.PI * 2;
+                const glyph = new THREE.Mesh(
+                  new THREE.BoxGeometry(0.12, 0.28, 0.08),
+                  new THREE.MeshBasicMaterial({ color: 0xf5b942, transparent: true, opacity: 0.75 })
+                );
+                glyph.position.set(Math.cos(a) * (radius - 0.2), Math.sin(a) * (radius - 0.2), 0);
+                glyph.rotation.z = a;
+                ring.add(glyph);
+              }
+            }
+
+            ring.userData = { speed: (i % 2 === 0 ? 1 : -1) * (0.22 + i * 0.025), baseZ: -i * 2.15 };
+            this.stargateRings.push(ring);
+            this.stargateGroup.add(ring);
+          }
+
+          this.scene.add(this.stargateGroup);
+        },
+
+        /* --- Trigger 3D Shockwave Ring Pulse on Active Artifact --- */
+        emitShockwave() {
+          if (!this.stageRoot) return;
+          SoundEngine.playPulse();
+
+          const meta = this.compMeta[this.activeCompKey] || this.compMeta.robowars;
+          const ring = new THREE.Mesh(
+            new THREE.TorusGeometry(0.75, 0.045, 16, 64),
+            new THREE.MeshBasicMaterial({
+              color: meta.keyColor,
+              transparent: true,
+              opacity: 0.95,
+              blending: THREE.AdditiveBlending,
+            })
+          );
+          ring.rotation.x = Math.PI / 2;
+          ring.userData = { age: 0, maxAge: 1.05 };
+          this.stageRoot.add(ring);
+          this.pulseRings.push(ring);
+
+          // Second vertical golden shockwave ring
+          const ring2 = new THREE.Mesh(
+            new THREE.TorusGeometry(0.55, 0.03, 12, 48),
+            new THREE.MeshBasicMaterial({
+              color: 0xf5b942,
+              transparent: true,
+              opacity: 0.85,
+              blending: THREE.AdditiveBlending,
+            })
+          );
+          ring2.userData = { age: 0, maxAge: 0.95 };
+          this.stageRoot.add(ring2);
+          this.pulseRings.push(ring2);
+
+          // Visual HUD Flash
+          const flash = document.getElementById('stage-pulse-flash');
+          if (flash) {
+            flash.classList.remove('opacity-0');
+            flash.classList.add('opacity-100');
+            setTimeout(() => {
+              flash.classList.remove('opacity-100');
+              flash.classList.add('opacity-0');
+            }, 650);
+          }
+        },
+
+        /* --- Dynamic 3D Warp Swap Between Competition Artifacts --- */
+        selectCompetition(key) {
+          if (!this.models[key] || key === this.activeCompKey) return;
+          SoundEngine.playWarp();
+          this.swapState = { active: true, phase: 0, targetKey: key };
+
+          const codeEl = document.getElementById('stage-model-code');
+          if (codeEl && this.compMeta[key]) {
+            codeEl.textContent = this.compMeta[key].code;
+          }
+        },
+
+        /* --- Toggle Wireframe / Hologram Mode on All Artifacts --- */
+        setWireframeMode(enabled) {
+          this.wireframeMode = enabled;
+          Object.values(this.models).forEach((model) => {
+            model.traverse((obj) => {
+              if (obj.isMesh && obj.material) {
+                if (obj.userData.origWireframe === undefined) {
+                  obj.userData.origWireframe = !!obj.material.wireframe;
+                }
+                obj.material.wireframe = enabled ? true : obj.userData.origWireframe;
+              }
+            });
+          });
+        },
+
+        /* --- Responsive 3D Framing for Act 3 Stage --- */
+        updateResponsiveStageOffset() {
+          if (!this.stageRoot) return;
+          const isDesktop = window.innerWidth >= 1024;
+          // On desktop, frame artifact neatly inside the left 55% viewport box; on mobile/tablet center it cleanly!
+          this.stageRoot.position.x = isDesktop ? -2.25 : 0;
+          this.stageRoot.position.y = isDesktop ? -20 : -19.2;
+          this.stageRoot.scale.setScalar(isDesktop ? 1.0 : 0.82);
+        },
+
+        /* --- Bind Pointer, Drag, Raycasting & Resize Events --- */
+        bindEvents() {
+          window.addEventListener('resize', () => {
+            if (!this.camera || !this.renderer) return;
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.updateResponsiveStageOffset();
+          });
+
+          // Global mouse parallax & cursor glow
+          const cursorGlow = document.getElementById('cursor-glow');
+          window.addEventListener('mousemove', (e) => {
+            this.mouseNorm.x = (e.clientX / window.innerWidth) * 2 - 1;
+            this.mouseNorm.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            this.pointerNDC.x = this.mouseNorm.x;
+            this.pointerNDC.y = this.mouseNorm.y;
+
+            if (cursorGlow) {
+              cursorGlow.style.opacity = '1';
+              cursorGlow.style.left = `${e.clientX}px`;
+              cursorGlow.style.top = `${e.clientY}px`;
+            }
+          });
+
+          // Direct 3D Artifact Drag & Click Interaction on both Viewport Zone & WebGL Canvas
+          const stageZone = document.getElementById('artifact-viewport-zone');
+          const canvas = document.getElementById('webgl-canvas');
+          const dragTargets = [stageZone, canvas].filter(Boolean);
+
+          const startDrag = (clientX, clientY) => {
+            this.isDragging = true;
+            this.dragMoved = false;
+            this.lastPointer.x = clientX;
+            this.lastPointer.y = clientY;
+          };
+
+          const moveDrag = (clientX, clientY) => {
+            if (!this.isDragging) return;
+            const dx = clientX - this.lastPointer.x;
+            const dy = clientY - this.lastPointer.y;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.dragMoved = true;
+
+            this.velY = dx * 0.011;
+            this.velX = dy * 0.009;
+            this.userRotY += this.velY;
+            this.userRotX = Math.max(-1.05, Math.min(1.05, this.userRotX + this.velX));
+
+            this.lastPointer.x = clientX;
+            this.lastPointer.y = clientY;
+          };
+
+          const endDrag = () => {
+            if (this.isDragging && !this.dragMoved) {
+              // Click without drag triggers Shockwave Pulse when in Act 3
+              if (Math.abs(this.scrollCurrent - 2) < 0.75) {
+                this.emitShockwave();
+              }
+            }
+            this.isDragging = false;
+          };
+
+          dragTargets.forEach((el) => {
+            el.addEventListener('mousedown', (e) => {
+              if (e.target.closest('button')) return;
+              startDrag(e.clientX, e.clientY);
+            });
+            el.addEventListener('touchstart', (e) => {
+              if (e.target.closest('button')) return;
+              if (e.touches.length === 1) {
+                startDrag(e.touches[0].clientX, e.touches[0].clientY);
+              }
+            }, { passive: true });
+          });
+
+          window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+          window.addEventListener('mouseup', endDrag);
+          window.addEventListener('touchmove', (e) => {
+            if (this.isDragging && e.touches.length === 1) {
+              moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+          }, { passive: true });
+          window.addEventListener('touchend', endDrag);
+        },
+
+        /* --- Compute Normalized Scroll Position Across the 5 Acts (0..4) --- */
+        updateScrollTarget() {
+          const sections = document.querySelectorAll('section[data-act]');
+          if (!sections.length) return;
+          const scrollY = window.scrollY;
+          let progress = 0;
+
+          for (let i = 0; i < sections.length - 1; i++) {
+            const topA = sections[i].offsetTop;
+            const topB = sections[i + 1].offsetTop;
+            if (scrollY >= topA && scrollY <= topB) {
+              progress = i + (scrollY - topA) / Math.max(1, topB - topA);
+              break;
+            } else if (scrollY > topB) {
+              progress = i + 1;
+            }
+          }
+          this.scrollTarget = Math.max(0, Math.min(4, progress));
+        },
+
+        /* --- Continuous 60fps Animation & Scroll Choreography Loop --- */
+        animate() {
+          requestAnimationFrame(() => this.animate());
+          if (!this.renderer || !this.scene || !this.camera) return;
+
+          const dt = Math.min(this.clock.getDelta(), 0.05);
+          const elapsed = this.clock.getElapsedTime();
+
+          // Smooth Lerped Scroll & Mouse Parallax
+          this.updateScrollTarget();
+          this.scrollCurrent = THREE.MathUtils.lerp(this.scrollCurrent, this.scrollTarget, 0.085);
+          this.mouseSmooth.x = THREE.MathUtils.lerp(this.mouseSmooth.x, this.mouseNorm.x, 0.06);
+          this.mouseSmooth.y = THREE.MathUtils.lerp(this.mouseSmooth.y, this.mouseNorm.y, 0.06);
+
+          const s = this.scrollCurrent; // 0 (Act1) -> 1 (Act2) -> 2 (Act3) -> 3 (Act4) -> 4 (Act5)
+
+          /* -------------------------------------------------------------------
+             CAMERA CHOREOGRAPHY ACROSS ALL 5 ACTS
+             ------------------------------------------------------------------- */
+          let camY = 0.2;
+          let camZ = 10.6;
+          let camX = this.mouseSmooth.x * 0.95;
+          let lookY = 0.2;
+          let lookZ = 0;
+
+          if (s <= 1) {
+            // Act 1 -> Act 2: Rise slightly & pull back as Astrolabe expands into a gilded disk
+            const t = s;
+            camY = THREE.MathUtils.lerp(0.2, 2.9, t);
+            camZ = THREE.MathUtils.lerp(10.6, 12.2, t);
+            lookY = THREE.MathUtils.lerp(0.2, 0.0, t);
+          } else if (s <= 2) {
+            // Act 2 -> Act 3: Smooth descent to Interactive Artifact Stage (y = -20)
+            const t = s - 1;
+            const ease = t * t * (3 - 2 * t);
+            camY = THREE.MathUtils.lerp(2.9, -19.8, ease);
+            camZ = THREE.MathUtils.lerp(12.2, 8.8, ease);
+            lookY = THREE.MathUtils.lerp(0.0, -20.0, ease);
+          } else if (s <= 3) {
+            // Act 3 -> Act 4: Swoop over Cyber-Topographic Powai Terrain (y = -40)
+            const t = s - 2;
+            const ease = t * t * (3 - 2 * t);
+            camY = THREE.MathUtils.lerp(-19.8, -37.2, ease);
+            camZ = THREE.MathUtils.lerp(8.8, 12.5, ease);
+            lookY = THREE.MathUtils.lerp(-20.0, -41.5, ease);
+            lookZ = THREE.MathUtils.lerp(0, -10, ease);
+          } else {
+            // Act 4 -> Act 5: Fly into the Hypnotic Stargate Portal (y = -62)
+            const t = s - 3;
+            const ease = t * t * (3 - 2 * t);
+            camY = THREE.MathUtils.lerp(-37.2, -62.0, ease);
+            camZ = THREE.MathUtils.lerp(12.5, 6.2, ease);
+            lookY = THREE.MathUtils.lerp(-41.5, -62.0, ease);
+            lookZ = THREE.MathUtils.lerp(-10, -24, ease);
+          }
+
+          this.camera.position.set(
+            camX,
+            camY + this.mouseSmooth.y * 0.45,
+            camZ
+          );
+          this.camera.lookAt(0, lookY, lookZ);
+
+          // Move Dynamic Lights smoothly with Camera Vertical Act
+          this.keyLight.position.set(6, camY + 3, camZ - 1);
+          this.rimLight.position.set(-7, camY - 2, camZ - 2);
+          this.fillLight.position.set(0, camY + 5, -7);
+
+          // Smooth Lighting Palette Transitions per Act
+          const targetKey = new THREE.Color(0x00f0ff);
+          const targetRim = new THREE.Color(0xf5b942);
+          if (s > 0.65 && s < 1.55) {
+            // Act 2: Warm Celestial Gold Legacy
+            targetKey.setHex(0xf5b942);
+            targetRim.setHex(0xffd27d);
+          } else if (s >= 1.55 && s < 2.65) {
+            // Act 3: Match Selected Competition
+            const meta = this.compMeta[this.activeCompKey] || this.compMeta.robowars;
+            targetKey.setHex(meta.keyColor);
+            targetRim.setHex(meta.rimColor);
+          } else if (s >= 2.65 && s < 3.55) {
+            // Act 4: Cyber Cyan & Plasma Violet
+            targetKey.setHex(0x00f0ff);
+            targetRim.setHex(0x8b5cf6);
+          } else if (s >= 3.55) {
+            // Act 5: Stargate Gold & Cyan
+            targetKey.setHex(0x00f0ff);
+            targetRim.setHex(0xf5b942);
+          }
+          this.keyLight.color.lerp(targetKey, 0.05);
+          this.rimLight.color.lerp(targetRim, 0.05);
+
+          /* -------------------------------------------------------------------
+             ACT 1 & ACT 2: ASTROLABE MORPH & PLANETARY DISK EXPANSION
+             ------------------------------------------------------------------- */
+          if (this.astrolabeGroup) {
+            const legacyT = Math.max(0, Math.min(1, s)); // 0 in Hero -> 1 in Legacy
+            // Tilt whole astrolabe smoothly into wide horizontal celestial disk in Act 2
+            this.astrolabeGroup.rotation.x = THREE.MathUtils.lerp(
+              this.mouseSmooth.y * 0.25,
+              1.08,
+              legacyT
+            );
+            this.astrolabeGroup.rotation.y = elapsed * 0.14 + this.mouseSmooth.x * 0.35;
+
+            // Expand concentric rings outward in Act 2
+            this.astroRings.forEach((ring, i) => {
+              const expandScale = 1 + legacyT * (0.28 + i * 0.22);
+              ring.scale.setScalar(expandScale);
+              ring.rotation.z = elapsed * (i % 2 === 0 ? 0.25 : -0.34);
+              ring.rotation.x = THREE.MathUtils.lerp(ring.userData.baseTilt.x, 0, legacyT);
+              ring.rotation.y = THREE.MathUtils.lerp(ring.userData.baseTilt.y, 0, legacyT);
+            });
+
+            // Morphing Crystalline Core vertex displacement
+            if (this.coreMesh && this.coreBasePos) {
+              const posAttr = this.coreMesh.geometry.attributes.position;
+              for (let i = 0; i < posAttr.count; i++) {
+                const bx = this.coreBasePos[i * 3];
+                const by = this.coreBasePos[i * 3 + 1];
+                const bz = this.coreBasePos[i * 3 + 2];
+                const wave = 1 + 0.11 * Math.sin(elapsed * 2.4 + bx * 2.8 + by * 2.4 + bz * 2.2);
+                posAttr.setXYZ(i, bx * wave, by * wave, bz * wave);
+              }
+              posAttr.needsUpdate = true;
+              this.coreMesh.rotation.y = elapsed * 0.45;
+              this.coreMesh.rotation.x = elapsed * 0.22;
+            }
+            if (this.coreWire) {
+              this.coreWire.rotation.y = -elapsed * 0.35;
+              this.coreWire.rotation.z = elapsed * 0.18;
+            }
+
+            // Orbiting Golden Satellites
+            this.satellites.forEach((sat) => {
+              const d = sat.userData;
+              sat.rotation.y = elapsed * d.speed + d.phase;
+              sat.rotation.x = THREE.MathUtils.lerp(d.tiltX, 0.05, legacyT);
+              sat.rotation.z = THREE.MathUtils.lerp(d.tiltZ, 0, legacyT);
+              sat.scale.setScalar(1 + legacyT * 0.35);
+            });
+          }
+
+          /* -------------------------------------------------------------------
+             ACT 3: INTERACTIVE 3D ARTIFACT STAGE, WARP SWAP & EXPLODE VIEW
+             ------------------------------------------------------------------- */
+          if (this.artifactPivot) {
+            // Smooth inertia damping when user releases drag
+            if (!this.isDragging) {
+              this.velY *= 0.92;
+              this.velX *= 0.92;
+              this.userRotY += this.velY + (this.autoSpin ? dt * 0.55 : 0);
+              this.userRotX = THREE.MathUtils.lerp(this.userRotX + this.velX, 0.16, 0.012);
+            }
+
+            this.artifactPivot.rotation.y = this.userRotY;
+            this.artifactPivot.rotation.x = this.userRotX;
+            this.artifactPivot.position.y = Math.sin(elapsed * 1.9) * 0.14;
+
+            // Dynamic Warp Swap Animation
+            if (this.swapState.active) {
+              this.swapState.phase += dt * 4.4;
+              if (this.swapState.phase < 1) {
+                const shrink = 1 - this.swapState.phase;
+                this.artifactPivot.scale.setScalar(Math.max(0.01, shrink));
+                this.userRotY += dt * 11;
+              } else {
+                if (this.activeCompKey !== this.swapState.targetKey) {
+                  this.models[this.activeCompKey].visible = false;
+                  this.activeCompKey = this.swapState.targetKey;
+                  this.models[this.activeCompKey].visible = true;
+                  this.emitShockwave();
+                }
+                const growT = Math.min(1, this.swapState.phase - 1);
+                // Elastic overshoot scale-in
+                const elastic = 1 + Math.sin(growT * Math.PI) * 0.16;
+                this.artifactPivot.scale.setScalar(THREE.MathUtils.lerp(0.05, 1, growT) * elastic);
+                if (growT >= 1) {
+                  this.artifactPivot.scale.setScalar(1);
+                  this.swapState.active = false;
+                }
+              }
+            }
+
+            // Smooth Explode View Interpolation on active artifact sub-components
+            this.explodeFactor = THREE.MathUtils.lerp(this.explodeFactor, this.explodeMode ? 1 : 0, 0.085);
+            const activeModel = this.models[this.activeCompKey];
+            if (activeModel) {
+              activeModel.children.forEach((child) => {
+                if (child.userData.basePos && child.userData.explodeVec) {
+                  child.position.copy(child.userData.basePos).addScaledVector(child.userData.explodeVec, this.explodeFactor);
+                }
+              });
+
+              // Model-Specific Live Kinetic Animations
+              if (this.activeCompKey === 'robowars' && activeModel.userData.weaponDrum) {
+                activeModel.userData.weaponDrum.rotation.x += dt * 15; // High-RPM weapon drum
+              }
+              if (this.activeCompKey === 'dronesoccer' && activeModel.userData.rotors) {
+                activeModel.userData.rotors.forEach((r, idx) => {
+                  r.rotation.y += dt * (idx % 2 === 0 ? 28 : -28);
+                });
+              }
+              if (this.activeCompKey === 'agentx' && activeModel.userData.pulses) {
+                activeModel.userData.pulses.forEach((p) => {
+                  p.userData.t = (p.userData.t + dt * p.userData.speed) % 1;
+                  p.position.lerpVectors(p.userData.from, p.userData.to, p.userData.t);
+                });
+                activeModel.userData.dataCubes.forEach((c, idx) => {
+                  c.rotation.x += dt * 1.1;
+                  c.rotation.y += dt * 1.4;
+                });
+              }
+              if (this.activeCompKey === 'innovatex' && activeModel.userData.bioRings) {
+                activeModel.userData.bioRings[0].rotation.z += dt * 0.5;
+                activeModel.userData.bioRings[1].rotation.z -= dt * 0.38;
+                activeModel.userData.beacons.forEach((b) => {
+                  b.rotation.y += dt * 2.2;
+                });
+              }
+
+              // Raycasting Hover Feedback when viewing Act 3
+              if (Math.abs(s - 2) < 0.7) {
+                this.raycaster.setFromCamera(this.pointerNDC, this.camera);
+                const hits = this.raycaster.intersectObject(activeModel, true);
+                const hovering = hits.length > 0;
+                if (hovering !== this.isHoveringArtifact) {
+                  this.isHoveringArtifact = hovering;
+                  const dot = document.getElementById('raycast-dot');
+                  const txt = document.getElementById('raycast-text');
+                  if (dot && txt) {
+                    dot.className = hovering
+                      ? 'h-2 w-2 rounded-full bg-cyanGlow shadow-[0_0_10px_#00f0ff]'
+                      : 'h-2 w-2 rounded-full bg-slate-500';
+                    txt.textContent = hovering
+                      ? 'TARGET LOCKED • CLICK TO PULSE'
+                      : 'DRAG TO ROTATE • CLICK TO PULSE';
+                  }
+                }
+              }
+            }
+
+            // Animate Active Shockwave Pulse Rings
+            for (let i = this.pulseRings.length - 1; i >= 0; i--) {
+              const r = this.pulseRings[i];
+              r.userData.age += dt;
+              const p = r.userData.age / r.userData.maxAge;
+              if (p >= 1) {
+                this.stageRoot.remove(r);
+                r.geometry.dispose();
+                r.material.dispose();
+                this.pulseRings.splice(i, 1);
+              } else {
+                r.scale.setScalar(1 + p * 4.8);
+                r.material.opacity = (1 - p) * 0.9;
+              }
+            }
+          }
+
+          /* -------------------------------------------------------------------
+             ACT 4: CYBER-TOPOGRAPHIC TERRAIN WAVE ANIMATION
+             ------------------------------------------------------------------- */
+          if (this.terrainGeo && s > 1.8 && s < 3.95) {
+            const pos = this.terrainGeo.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+              const x = this.terrainBaseZ[i * 2];
+              const z = this.terrainBaseZ[i * 2 + 1];
+              const y =
+                Math.sin(x * 0.28 + elapsed * 1.25) * 0.75 +
+                Math.cos(z * 0.32 + elapsed * 0.95) * 0.65 +
+                Math.sin((x + z) * 0.16 - elapsed * 0.7) * 0.45;
+              pos.setY(i, y);
+            }
+            pos.needsUpdate = true;
+
+            this.terrainPillars.forEach((pillar) => {
+              pillar.position.y = pillar.userData.baseY + Math.sin(elapsed * 2 + pillar.userData.phase) * 0.25;
+            });
+          }
+
+          /* -------------------------------------------------------------------
+             ACT 5: STARGATE WARP TUNNEL ROTATION & STREAMING DEPTH
+             ------------------------------------------------------------------- */
+          if (this.stargateRings.length && s > 2.8) {
+            this.warpBoost = THREE.MathUtils.lerp(this.warpBoost, 0, 0.04);
+            const speedMul = 1 + this.warpBoost * 4.5;
+            this.stargateRings.forEach((ring) => {
+              ring.rotation.z += dt * ring.userData.speed * speedMul;
+              ring.position.z += dt * (2.6 * speedMul);
+              if (ring.position.z > 3.5) {
+                ring.position.z -= this.stargateRings.length * 2.15;
+              }
+            });
+          }
+
+          /* -------------------------------------------------------------------
+             COSMIC STARFIELD GENTLE DRIFT
+             ------------------------------------------------------------------- */
+          if (this.starField) {
+            this.starField.rotation.y = elapsed * 0.018 + this.mouseSmooth.x * 0.04;
+            this.starField.position.x = -this.mouseSmooth.x * 0.8;
+          }
+
+          this.renderer.render(this.scene, this.camera);
+        },
+      };
+
+      /* =======================================================================
+         3. UI CONTROLLERS: LOADING SCREEN, ORBITAL RAIL, COUNTERS, TABS, PASS
+         ======================================================================= */
+
+      // --- Animated Loading Screen ---
+      function runLoaderSequence() {
+        const bar = document.getElementById('loader-bar');
+        const pct = document.getElementById('loader-percent');
+        const status = document.getElementById('loader-status');
+        const loader = document.getElementById('loader-screen');
+        const statuses = [
+          'CALIBRATING CELESTIAL OPTICS...',
+          'SYNTHESIZING 3D ASTROLABE GEOMETRY...',
+          'LOADING ROBOWARS & NEURAL ARTIFACTS...',
+          'STABILIZING POWAI CAMPUS TELEMETRY...',
+          'AETHERIAL CORE ONLINE // WELCOME',
+        ];
+        let val = 0;
+        const step = setInterval(() => {
+          val += Math.floor(Math.random() * 14) + 9;
+          if (val >= 100) {
+            val = 100;
+            clearInterval(step);
+            if (bar) bar.style.width = '100%';
+            if (pct) pct.textContent = '100%';
+            if (status) status.textContent = statuses[4];
+            setTimeout(() => {
+              if (loader) loader.classList.add('hidden-loader');
+            }, 340);
+          } else {
+            if (bar) bar.style.width = `${val}%`;
+            if (pct) pct.textContent = `${val}%`;
+            if (status) {
+              const idx = Math.min(3, Math.floor((val / 100) * 4));
+              status.textContent = statuses[idx];
+            }
+          }
+        }, 70);
+      }
+
+      // --- Orbital Progress Rail & Active Section Tracking ---
+      function setupOrbitalRail() {
+        const sections = document.querySelectorAll('section[data-act]');
+        const railItems = document.querySelectorAll('.rail-item');
+        const progressLine = document.getElementById('rail-progress-line');
+
+        railItems.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            SoundEngine.playClick();
+            const target = document.querySelector(btn.getAttribute('data-target'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+          });
+        });
+
+        window.addEventListener('scroll', () => {
+          const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+          const pct = Math.min(100, Math.max(0, (window.scrollY / maxScroll) * 100));
+          if (progressLine) progressLine.style.height = `${pct * 0.88}%`;
+
+          let currentAct = 0;
+          sections.forEach((sec, idx) => {
+            const rect = sec.getBoundingClientRect();
+            if (rect.top <= window.innerHeight * 0.48) currentAct = idx;
+          });
+
+          railItems.forEach((item, idx) => {
+            item.classList.toggle('active', idx === currentAct);
+          });
+        }, { passive: true });
+      }
+
+      // --- Animated Legacy Counters (Act 2) ---
+      function setupLegacyCounters() {
+        const container = document.getElementById('legacy-metrics');
+        if (!container) return;
+        let triggered = false;
+
+        const animateCounters = () => {
+          const counters = container.querySelectorAll('.counter');
+          counters.forEach((el) => {
+            const target = parseFloat(el.getAttribute('data-target')) || 0;
+            const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+            const useComma = el.getAttribute('data-comma') === 'true';
+            const duration = 1650;
+            const start = performance.now();
+
+            const tick = (now) => {
+              const p = Math.min(1, (now - start) / duration);
+              const ease = 1 - Math.pow(1 - p, 3);
+              const current = target * ease;
+              let formatted = decimals > 0 ? current.toFixed(decimals) : Math.round(current).toString();
+              if (useComma) formatted = Number(formatted).toLocaleString('en-IN');
+              el.textContent = formatted;
+              if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          });
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting && !triggered) {
+              triggered = true;
+              animateCounters();
+            }
+          },
+          { threshold: 0.3 }
+        );
+        observer.observe(container);
+      }
+
+      // --- Act 3 Competition Selector & Floating 3D Control Dock ---
+      function setupArenaControls() {
+        const cards = document.querySelectorAll('.comp-card');
+        cards.forEach((card) => {
+          card.addEventListener('click', () => {
+            const key = card.getAttribute('data-comp');
+            cards.forEach((c) => c.classList.remove('active'));
+            card.classList.add('active');
+            Engine.selectCompetition(key);
+          });
+        });
+
+        const btnExplode = document.getElementById('ctrl-explode');
+        const btnWire = document.getElementById('ctrl-wireframe');
+        const btnPulse = document.getElementById('ctrl-pulse');
+        const btnSpin = document.getElementById('ctrl-autospin');
+
+        if (btnExplode) {
+          btnExplode.addEventListener('click', () => {
+            Engine.explodeMode = !Engine.explodeMode;
+            btnExplode.classList.toggle('active', Engine.explodeMode);
+            SoundEngine.playClick();
+            showToast(Engine.explodeMode ? 'EXPLODE VIEW ENGAGED' : 'COMPONENT ASSEMBLY RESTORED');
+          });
+        }
+
+        if (btnWire) {
+          btnWire.addEventListener('click', () => {
+            const next = !Engine.wireframeMode;
+            Engine.setWireframeMode(next);
+            btnWire.classList.toggle('active', next);
+            SoundEngine.playClick();
+            showToast(next ? 'HOLOGRAM WIREFRAME ACTIVE' : 'STANDARD SHADING RESTORED');
+          });
+        }
+
+        if (btnPulse) {
+          btnPulse.addEventListener('click', () => {
+            Engine.emitShockwave();
+          });
+        }
+
+        if (btnSpin) {
+          btnSpin.addEventListener('click', () => {
+            Engine.autoSpin = !Engine.autoSpin;
+            btnSpin.classList.toggle('active', Engine.autoSpin);
+            SoundEngine.playClick();
+          });
+        }
+      }
+
+      // --- Act 4 Interactive 3-Day Schedule Timeline ---
+      const SCHEDULE_DATA = {
+        day1: [
+          { time: '09:30 IST', title: 'Grand Inauguration & Keynote', venue: 'Convocation Hall, IITB', tag: 'CEREMONY', color: 'text-celestialGold border-celestialGold/40 bg-celestialGold/10' },
+          { time: '12:00 IST', title: 'International Robowars — Qualifiers', venue: 'Open Air Theatre (OAT)', tag: 'COMBAT', color: 'text-cyanGlow border-cyanGlow/40 bg-cyanGlow/10' },
+          { time: '15:30 IST', title: 'Aetherial Tech Expo & Defense Pavilion', venue: 'VMCC Exhibition Grounds', tag: 'EXPO', color: 'text-purple-300 border-plasmaViolet/40 bg-plasmaViolet/15' },
+          { time: '19:30 IST', title: 'Opening Laser Symphony & Keynote Night', venue: 'Gymkhana Grounds', tag: 'SPECTACLE', color: 'text-cyanGlow border-cyanGlow/40 bg-cyanGlow/10' },
+        ],
+        day2: [
+          { time: '10:00 IST', title: 'Drone Soccer — Class 200 Caged Arena', venue: 'SAC Indoor Stadium', tag: 'AERIAL', color: 'text-cyanGlow border-cyanGlow/40 bg-cyanGlow/10' },
+          { time: '13:00 IST', title: 'AgentX & AI Hackathons — Live Finals', venue: 'Lecture Hall Complex (LHC)', tag: 'AI & AGENTS', color: 'text-purple-300 border-plasmaViolet/40 bg-plasmaViolet/15' },
+          { time: '16:00 IST', title: 'Frontier Workshops & International Tech Expo', venue: 'Main Building Lawns', tag: 'HANDS-ON', color: 'text-celestialGold border-celestialGold/40 bg-celestialGold/10' },
+          { time: '20:00 IST', title: 'Technoholix: Autonomous Drone Sky Show', venue: 'Powai Lakefront Arena', tag: 'PRONITE', color: 'text-cyanGlow border-cyanGlow/40 bg-cyanGlow/10' },
+        ],
+        day3: [
+          { time: '11:00 IST', title: 'InnovateX — Sustainability Challenge Showcase', venue: 'VMCC Auditorium', tag: 'CLIMATE TECH', color: 'text-emerald-300 border-emerald-400/40 bg-emerald-400/10' },
+          { time: '14:30 IST', title: 'International Robowars — Grand Finale', venue: 'Open Air Theatre (OAT)', tag: '₹10L FINALE', color: 'text-celestialGold border-celestialGold/40 bg-celestialGold/10' },
+          { time: '18:00 IST', title: '30th Edition Valedictory & Awards Ceremony', venue: 'Convocation Hall, IITB', tag: 'AWARDS', color: 'text-cyanGlow border-cyanGlow/40 bg-cyanGlow/10' },
+          { time: '20:30 IST', title: 'Aetherial Closing EDM Night', venue: 'Gymkhana Grounds', tag: 'EDM NIGHT', color: 'text-purple-300 border-plasmaViolet/40 bg-plasmaViolet/15' },
+        ],
+      };
+
+      function setupScheduleTabs() {
+        const tabs = document.querySelectorAll('.day-tab');
+        const container = document.getElementById('timeline-content');
+
+        const renderDay = (dayKey) => {
+          if (!container || !SCHEDULE_DATA[dayKey]) return;
+          container.innerHTML = SCHEDULE_DATA[dayKey]
+            .map(
+              (ev) => `
+              <div class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:border-cyanGlow/45 hover:bg-white/[0.06] transition-all">
+                <div class="flex items-start gap-4">
+                  <div class="shrink-0 rounded-xl border border-white/10 bg-obsidian/70 px-3 py-1.5 font-mono text-xs font-semibold text-cyanGlow">
+                    ${ev.time}
+                  </div>
+                  <div>
+                    <div class="font-heading text-base font-bold text-white group-hover:text-cyanGlow transition-colors">${ev.title}</div>
+                    <div class="mt-0.5 font-mono text-[11px] text-slate-400">${ev.venue}</div>
+                  </div>
+                </div>
+                <span class="self-start sm:self-center shrink-0 rounded-lg border px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${ev.color}">
+                  ${ev.tag}
+                </span>
+              </div>
+            `
+            )
+            .join('');
+        };
+
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            SoundEngine.playClick();
+            tabs.forEach((t) => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderDay(tab.getAttribute('data-day'));
+          });
+        });
+
+        renderDay('day1');
+      }
+
+      // --- Act 5 Interactive 3D Holographic Pass Generator ---
+      function setupPassGenerator() {
+        const form = document.getElementById('pass-form');
+        const nameInput = document.getElementById('pass-name');
+        const orgInput = document.getElementById('pass-org');
+        const trackPills = document.querySelectorAll('.track-pill');
+
+        const badgeName = document.getElementById('badge-name');
+        const badgeOrg = document.getElementById('badge-org');
+        const badgeTrack = document.getElementById('badge-track');
+        const badgeId = document.getElementById('badge-id');
+        const badgeQR = document.getElementById('badge-qr');
+        const holoCard = document.getElementById('holo-card');
+
+        let currentTrack = 'Robotics';
+        let currentPassId = 'TF26-8492';
+
+        // Deterministic Crisp SVG QR-Style Matrix Generator
+        function renderQR(seedStr) {
+          if (!badgeQR) return;
+          let hash = 2166136261;
+          for (let i = 0; i < seedStr.length; i++) {
+            hash ^= seedStr.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+          }
+
+          const size = 21;
+          let rects = '<rect width="21" height="21" fill="#ffffff"/>';
+
+          const drawFinder = (ox, oy) => {
+            rects += `<rect x="${ox}" y="${oy}" width="7" height="7" fill="#04060e"/>`;
+            rects += `<rect x="${ox + 1}" y="${oy + 1}" width="5" height="5" fill="#ffffff"/>`;
+            rects += `<rect x="${ox + 2}" y="${oy + 2}" width="3" height="3" fill="#04060e"/>`;
+          };
+          drawFinder(0, 0);
+          drawFinder(14, 0);
+          drawFinder(0, 14);
+
+          for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+              const inFinder =
+                (x < 8 && y < 8) || (x >= 13 && y < 8) || (x < 8 && y >= 13);
+              if (inFinder) continue;
+              hash = (hash * 1664525 + 1013904223) >>> 0;
+              if ((hash & 7) > 3) {
+                rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="#04060e"/>`;
+              }
+            }
+          }
+          badgeQR.innerHTML = rects;
+        }
+
+        function updateBadgeVisual(generateNewId = false) {
+          const nameVal = (nameInput.value.trim() || 'AARAV KULKARNI').toUpperCase();
+          const orgVal = orgInput.value.trim() || 'IIT Bombay, Powai';
+
+          if (generateNewId) {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            currentPassId = `TF26-${rand}`;
+          }
+
+          badgeName.textContent = nameVal;
+          badgeOrg.textContent = orgVal;
+          badgeTrack.textContent = `TRACK // ${currentTrack.toUpperCase()}`;
+          badgeId.textContent = currentPassId;
+          renderQR(`${currentPassId}|${nameVal}|${orgVal}|${currentTrack}`);
+        }
+
+        // Track Pill Selection
+        trackPills.forEach((pill) => {
+          pill.addEventListener('click', () => {
+            SoundEngine.playClick();
+            trackPills.forEach((p) => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentTrack = pill.getAttribute('data-track');
+            updateBadgeVisual(false);
+          });
+        });
+
+        // Live preview as user types
+        nameInput.addEventListener('input', () => updateBadgeVisual(false));
+        orgInput.addEventListener('input', () => updateBadgeVisual(false));
+
+        // Mint Submit
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          updateBadgeVisual(true);
+          Engine.warpBoost = 1.0; // Hypnotic Stargate speed surge!
+          SoundEngine.playChime(587, 880, 0.25);
+          showToast(`PASS ${currentPassId} MINTED // WELCOME TO TECHFEST '26`);
+        });
+
+        // Interactive 3D Tilt & Iridescent Foil Shimmer on Hover / Touch
+        if (holoCard) {
+          const applyTilt = (clientX, clientY) => {
+            const rect = holoCard.getBoundingClientRect();
+            const px = (clientX - rect.left) / rect.width;
+            const py = (clientY - rect.top) / rect.height;
+            const rotY = (px - 0.5) * 24;
+            const rotX = (0.5 - py) * 20;
+            holoCard.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.02,1.02,1.02)`;
+            holoCard.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`);
+            holoCard.style.setProperty('--my', `${(py * 100).toFixed(1)}%`);
+          };
+
+          holoCard.addEventListener('mousemove', (e) => applyTilt(e.clientX, e.clientY));
+          holoCard.addEventListener('mouseleave', () => {
+            holoCard.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+          });
+          holoCard.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1) {
+              applyTilt(e.touches[0].clientX, e.touches[0].clientY);
+            }
+          }, { passive: true });
+          holoCard.addEventListener('touchend', () => {
+            holoCard.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+          });
+        }
+
+        // Copy Pass ID via iframe-safe document.execCommand('copy')
+        const btnCopy = document.getElementById('btn-copy-pass');
+        if (btnCopy) {
+          btnCopy.addEventListener('click', () => {
+            SoundEngine.playClick();
+            const copyText = `TECHFEST '26 VISITOR PASS | ID: ${currentPassId} | Name: ${badgeName.textContent} | Org: ${badgeOrg.textContent} | Track: ${currentTrack} | 16-18 Dec 2026, IIT Bombay`;
+            const ta = document.createElement('textarea');
+            ta.value = copyText;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy');
+              showToast(`COPIED ${currentPassId} TO CLIPBOARD`);
+            } catch (err) {
+              showToast(`PASS ID: ${currentPassId}`);
+            }
+            document.body.removeChild(ta);
+          });
+        }
+
+        // Render & Download High-Res PNG of the Holographic Pass via Canvas
+        const btnDownload = document.getElementById('btn-download-pass');
+        if (btnDownload) {
+          btnDownload.addEventListener('click', () => {
+            SoundEngine.playChime(490, 740, 0.2);
+            try {
+              const c = document.createElement('canvas');
+              c.width = 920;
+              c.height = 540;
+              const ctx = c.getContext('2d');
+
+              // Obsidian + Iridescent Gradient Card Background
+              const bg = ctx.createLinearGradient(0, 0, 920, 540);
+              bg.addColorStop(0, '#0c1328');
+              bg.addColorStop(0.5, '#050814');
+              bg.addColorStop(1, '#181030');
+              ctx.fillStyle = bg;
+              ctx.fillRect(0, 0, 920, 540);
+
+              // Subtle Glow Orbs
+              const g1 = ctx.createRadialGradient(160, 90, 10, 160, 90, 320);
+              g1.addColorStop(0, 'rgba(0, 240, 255, 0.25)');
+              g1.addColorStop(1, 'rgba(0, 240, 255, 0)');
+              ctx.fillStyle = g1;
+              ctx.fillRect(0, 0, 920, 540);
+
+              const g2 = ctx.createRadialGradient(780, 440, 10, 780, 440, 320);
+              g2.addColorStop(0, 'rgba(245, 185, 66, 0.26)');
+              g2.addColorStop(1, 'rgba(245, 185, 66, 0)');
+              ctx.fillStyle = g2;
+              ctx.fillRect(0, 0, 920, 540);
+
+              // Border
+              ctx.strokeStyle = 'rgba(0, 240, 255, 0.65)';
+              ctx.lineWidth = 3;
+              ctx.strokeRect(18, 18, 884, 504);
+
+              // Typography
+              ctx.fillStyle = '#00f0ff';
+              ctx.font = 'bold 18px monospace';
+              ctx.fillText('OFFICIAL VISITOR CREDENTIAL // 30TH EDITION', 56, 76);
+
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 48px sans-serif';
+              ctx.fillText("TECHFEST '26", 56, 134);
+
+              ctx.fillStyle = '#f5b942';
+              ctx.font = 'bold 20px monospace';
+              ctx.fillText('AN AETHERIAL RENAISSANCE', 56, 168);
+
+              // Pass ID Box
+              ctx.strokeStyle = '#f5b942';
+              ctx.lineWidth = 2;
+              ctx.strokeRect(675, 56, 190, 74);
+              ctx.fillStyle = '#f5b942';
+              ctx.font = '14px monospace';
+              ctx.fillText('PASS ID', 695, 82);
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 26px monospace';
+              ctx.fillText(currentPassId, 695, 114);
+
+              // Divider
+              ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+              ctx.beginPath();
+              ctx.moveTo(56, 200);
+              ctx.lineTo(864, 200);
+              ctx.stroke();
+
+              // Bearer Details
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = '15px monospace';
+              ctx.fillText('BEARER NAME', 56, 252);
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 38px sans-serif';
+              ctx.fillText(badgeName.textContent.slice(0, 26), 56, 298);
+
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = '15px monospace';
+              ctx.fillText('AFFILIATION', 56, 352);
+              ctx.fillStyle = '#e2e8f0';
+              ctx.font = '24px sans-serif';
+              ctx.fillText(badgeOrg.textContent.slice(0, 36), 56, 386);
+
+              ctx.fillStyle = '#00f0ff';
+              ctx.font = 'bold 18px monospace';
+              ctx.fillText(`TRACK // ${currentTrack.toUpperCase()}   •   16–18 DEC 2026`, 56, 444);
+
+              ctx.fillStyle = '#f5b942';
+              ctx.font = '15px monospace';
+              ctx.fillText('IIT BOMBAY • POWAI, MUMBAI • HOLOGRAPHIC VERIFIED', 56, 492);
+
+              // Visual QR box on canvas
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(710, 275, 152, 152);
+              ctx.fillStyle = '#04060e';
+              for (let r = 0; r < 11; r++) {
+                for (let col = 0; col < 11; col++) {
+                  if ((r + col * 3 + currentPassId.charCodeAt(5)) % 2 === 0 || (r < 3 && col < 3) || (r < 3 && col > 7) || (r > 7 && col < 3)) {
+                    ctx.fillRect(720 + col * 12, 285 + r * 12, 10, 10);
+                  }
+                }
+              }
+
+              const link = document.createElement('a');
+              link.download = `Techfest26_Pass_${currentPassId}.png`;
+              link.href = c.toDataURL('image/png');
+              link.click();
+              showToast(`DOWNLOADED ${currentPassId} PASS PNG`);
+            } catch (err) {
+              showToast(`PASS ${currentPassId} READY FOR CAMPUS ENTRY`);
+            }
+          });
+        }
+
+        // Initial default QR render
+        updateBadgeVisual(false);
+      }
+
+      // --- Sound Toggle Button ---
+      function setupAudioToggle() {
+        const btn = document.getElementById('sfx-toggle-btn');
+        const label = document.getElementById('sfx-label');
+        const eq = document.getElementById('sfx-eq');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          const active = SoundEngine.toggle();
+          if (label) label.textContent = active ? 'SFX ON' : 'SFX OFF';
+          if (eq) eq.classList.toggle('sfx-active', active);
+          btn.classList.toggle('border-cyanGlow/70', active);
+          showToast(active ? 'AETHERIAL AUDIO SYNTH ENABLED' : 'AUDIO SYNTH MUTED');
+        });
+      }
+
+      /* =======================================================================
+         BOOT ON WINDOW LOAD
+         ======================================================================= */
+      window.onload = function () {
+        runLoaderSequence();
+        const webglOk = Engine.init();
+        if (webglOk) {
+          Engine.animate();
+        }
+        setupOrbitalRail();
+        setupLegacyCounters();
+        setupArenaControls();
+        setupScheduleTabs();
+        setupPassGenerator();
+        setupAudioToggle();
+      };
+    })();
+  </script>
+</body>
+</html>
